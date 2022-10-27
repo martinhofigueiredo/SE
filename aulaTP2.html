@@ -1,0 +1,52 @@
+<h1 id="response-time-analysis">Response Time Analysis</h1>
+<ul>
+<li>The response time analysis doesnt variate from the prioritization mode or forces the rate to be monotonic</li>
+</ul>
+<h1 id="online-scheduling-with-dynamic-priorities">Online scheduling with dynamic priorities</h1>
+<p>The schedule is being <strong>built</strong> while it works so it maintains an otptimum order.</p>
+<h1 id="pros">Pros</h1>
+<ul>
+<li>Easily Scalable
+<ul>
+<li>since it considers everytime in runtime it can deal with a bigger amount of task</li>
+<li>this property makes it able to deal with sporadic tasks</li>
+</ul></li>
+</ul>
+<h1 id="cons">Cons</h1>
+<ul>
+<li>Harder to implement than cyclic
+<ul>
+<li>this needs to be constantly updating so theres a compute power loss since the scheduler needs some cycle itseld to run</li>
+</ul></li>
+</ul>
+<h1 id="dynamic-priorities">Dynamic priorities</h1>
+<ul>
+<li><strong>EDF</strong> Earliest Deadline first
+<ul>
+<li>Inversely proprotional to the time of the deadline</li>
+<li>optimal with respect to dynamic priorities criteria</li>
+</ul></li>
+<li><strong>LSF</strong> Least Slack First or <strong>LLF</strong> Least Laxity First
+<ul>
+<li>Inversely proportional to slack or laxity rsad %t%</li>
+<li>optimal with respect to dynamic priorities criteria</li>
+</ul></li>
+<li><strong>FCFS</strong> First Come First Serve
+<ul>
+<li>doesnt need preemption because it will always do the task by order of request</li>
+</ul></li>
+</ul>
+<h2 id="edf-utilization-base-schedulability-tests-for-edf">EDF Utilization base schedulability tests for EDF</h2>
+<ul>
+<li>In this mode the task with the closest deadline will be prioritized. We can also conclude that with the Utilization Rate that if it is under 1 then it is schedulable</li>
+</ul>
+<p><br /><span class="math display">$$ U = \frac{C_i}{T_i} $$</span><br /></p>
+<p><br /><span class="math display">$$ U = \sum{n}{i=1}\frac{C_i}{min(T_i,D_i)} $$</span><br /></p>
+<h2 id="rate-monotonicrm-vs-edf">(Rate Monotonic)<strong>RM</strong> vs <strong>EDF</strong></h2>
+<ul>
+<li>If the worst case possible is possible (when the tasks run with the least slack) the a case with more slack will work</li>
+</ul>
+<h2 id="notion-of-fairness">Notion of fairness</h2>
+<h2 id="cpu-demand-analysis">CPU Demand Analysis</h2>
+<p>Knowing L, we then need to guarantee that the following load condition is met, i.e. </p>
+<p><br /><span class="math display"><em>h</em>(<em>t</em>) &lt;  = <em>t</em></span><br /></p>
