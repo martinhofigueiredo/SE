@@ -1,5 +1,5 @@
 #include <Arduino.h>
-
+#include <ukernel.h>
 /* Define shift register pins used for seven segment display */
 #define LATCH_DIO 4
 #define CLK_DIO 7
@@ -18,21 +18,47 @@ const byte SEGMENT_SELECT[] = {0xF1,0xF2,0xF4,0xF8};
 #define NT 20
 Sched_Task_t Tasks [NT];
 
-typedef struct {
-   /* period in ticks    */
-int period;
-   /* ticks to activate  */
-int delay;
-   /* function pointer   */
-void (*func)(void);
-   /* activation counter */
-int exec;
-} Sched_Task_t;
+
 
 int count;
 
 volatile int go = 0; //Volatile makes the variable change without the compiler knowing about it
 int c = 0;
+
+void t1(void) {
+  static int c = 0;
+  if(c++ == 10)
+    {
+      digitalWrite(d1, !digitalRead(d1));  c=0; 
+    }
+    count++;
+  }
+void t2(void) {digitalWrite(d2, !digitalRead(d2));}
+void t3(void) {digitalWrite(d3, !digitalRead(d3)); }
+void t4(void) {digitalWrite(d4, !digitalRead(A1)); }
+void t5(void) {
+  static int seg = 0;
+  switch(seg)
+  {
+    case 0: WriteNumberToSegment(0 , count / 1000); seg=1; break;
+    case 1: WriteNumberToSegment(1 , (count / 100) % 10); seg=2; break;
+    case 2: WriteNumberToSegment(2 , (count / 10) % 10); seg=3; break;
+    case 3: WriteNumberToSegment(3 , count % 10); seg=0; break;
+  }
+}
+
+ISR(TIMER1_COMPA_vect){//timer1 interrupt
+go = 1; // toggle LED pin
+Sched_Schedule();
+}
+
+void sync (void) 
+{
+  while(!go); //wait
+  go = 0;     //reset flag
+}
+
+
 
 void setup() {
   // put your setup code here, to run once:
@@ -71,38 +97,7 @@ void loop() {
 }
 
 
-void t1(void) {
-  static int c = 0;
-  if(c++ == 10)
-    {
-      digitalWrite(d1, !digitalRead(d1));  c=0; 
-    }
-    count++;
-  }
-void t2(void) {digitalWrite(d2, !digitalRead(d2));}
-void t3(void) {digitalWrite(d3, !digitalRead(d3)); }
-void t4(void) {digitalWrite(d4, !digitalRead(A1)); }
-void t5(void) {
-  static int seg = 0;
-  switch(seg)
-  {
-    case 0: WriteNumberToSegment(0 , count / 1000); seg=1; break;
-    case 1: WriteNumberToSegment(1 , (count / 100) % 10); seg=2; break;
-    case 2: WriteNumberToSegment(2 , (count / 10) % 10); seg=3; break;
-    case 3: WriteNumberToSegment(3 , count % 10); seg=0; break;
-  }
-}
 
-ISR(TIMER1_COMPA_vect){//timer1 interrupt
-go = 1; // toggle LED pin
-Sched_Schedule();
-}
-
-void sync (void) 
-{
-  while(!go); //wait
-  go = 0;     //reset flag
-}
 
 
 /* Wite a ecimal number between 0 and 9 to one of the 4 digits of the display */
