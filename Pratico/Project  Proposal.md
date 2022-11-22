@@ -1,10 +1,11 @@
-# Grupo
+# Project Proposal
+
+## Smart Desk Clock wiht IOT tie-ins
+
+__Grupo__
 - Martinho Figueiredo up201506179
 - Tulio Soares up201800165
 
-# Project Proposal
-
-Smart Desk Clock wiht IOT tie-ins
 
 ## Objectives 
 - Configure this with FreerRTOS
@@ -21,3 +22,4 @@ Smart Desk Clock wiht IOT tie-ins
 #  References
 
 - [LaColorduino](https://github.com/TheAmadeus25/LaColorduino)
+- [Colorduino]https://github.com/lincomatic/Colorduino
