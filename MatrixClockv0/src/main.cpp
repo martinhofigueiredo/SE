@@ -1,193 +1,182 @@
-/*
-  Display "flicker free" scrolling text and updating number
+// Sketch to draw an analogue clock on the screen
+// This uses anti-aliased drawing functions that are built into TFT_eSPI
 
-  Example for library:
-  https://github.com/Bodmer/TFT_eSPI
+// Anti-aliased lines can be drawn with sub-pixel resolution and permit lines to be
+// drawn with less jaggedness.
 
-  The sketch has been tested on a 320x240 ILI9341 based TFT, it
-  could be adapted for other screen sizes.
+// Based on a sketch by DavyLandman:
+// https://github.com/Bodmer/TFT_eSPI/issues/905
 
-  A Sprite is notionally an invisible graphics screen that is
-  kept in the processors RAM. Graphics can be drawn into the
-  Sprite just as it can be drawn directly to the screen. Once
-  the Sprite is completed it can be plotted onto the screen in
-  any position. If there is sufficient RAM then the Sprite can
-  be the same size as the screen and used as a frame buffer.
 
-  The Sprite occupies (2 * width * height) bytes.
+#define WIFI_SSID      "SGEVL_WLAN"
+#define WIFI_PASSWORD  "sgevl2050"
 
-  On a ESP8266 Sprite sizes up to 128 x 160 can be accommodated,
-  this size requires 128*160*2 bytes (40kBytes) of RAM, this must be
-  available or the processor will crash. You need to make the sprite
-  small enough to fit, with RAM spare for any "local variables" that
-  may be needed by your sketch and libraries.
-
-  Created by Bodmer 15/11/17
-
-  #########################################################################
-  ###### DON'T FORGET TO UPDATE THE User_Setup.h FILE IN THE LIBRARY ######
-  #########################################################################
-*/
-
-// Size of sprite image for the scrolling text, this requires ~14 Kbytes of RAM
-#define IWIDTH  240
-#define IHEIGHT 30
-
-// Pause in milliseconds to set scroll speed
-#define WAIT 0
-
-#include <TFT_eSPI.h>                 // Include the graphics library (this includes the sprite functions)
 #include <Arduino.h>
+#include <TFT_eSPI.h> // Master copy here: https://github.com/Bodmer/TFT_eSPI
+#include <SPI.h>
 
-TFT_eSPI    tft = TFT_eSPI();         // Create object "tft"
+#include "NotoSansBold15.h"
 
-TFT_eSprite img = TFT_eSprite(&tft);  // Create Sprite object "img" with pointer to "tft" object
-//                                    // the pointer is used by pushSprite() to push it onto the TFT
+TFT_eSPI tft = TFT_eSPI();  // Invoke library, pins defined in User_Setup.h
+TFT_eSprite face = TFT_eSprite(&tft);
 
-// #########################################################################
-// Build the scrolling sprite image from scratch, draw text at x = xpos
-// #########################################################################
-// #########################################################################
-// Return a 16 bit rainbow colour
-// #########################################################################
-unsigned int rainbow(byte value)
-{
-  // Value is expected to be in range 0-127
-  // The value is converted to a spectrum colour from 0 = red through to 127 = blue
+#define CLOCK_X_POS 10
+#define CLOCK_Y_POS 10
 
-  byte red   = 0; // Red is the top 5 bits of a 16 bit colour value
-  byte green = 0;// Green is the middle 6 bits
-  byte blue  = 0; // Blue is the bottom 5 bits
+#define CLOCK_FG   TFT_SKYBLUE
+#define CLOCK_BG   TFT_NAVY
+#define SECCOND_FG TFT_RED
+#define LABEL_FG   TFT_GOLD
 
-  byte sector = value >> 5;
-  byte amplit = value & 0x1F;
+#define CLOCK_R       127.0f / 2.0f // Clock face radius (float type)
+#define H_HAND_LENGTH CLOCK_R/2.0f
+#define M_HAND_LENGTH CLOCK_R/1.4f
+#define S_HAND_LENGTH CLOCK_R/1.3f
 
-  switch (sector)
-  {
-    case 0:
-      red   = 0x1F;
-      green = amplit;
-      blue  = 0;
-      break;
-    case 1:
-      red   = 0x1F - amplit;
-      green = 0x1F;
-      blue  = 0;
-      break;
-    case 2:
-      red   = 0;
-      green = 0x1F;
-      blue  = amplit;
-      break;
-    case 3:
-      red   = 0;
-      green = 0x1F - amplit;
-      blue  = 0x1F;
-      break;
-  }
+#define FACE_W CLOCK_R * 2 + 1
+#define FACE_H CLOCK_R * 2 + 1
 
-  return red << 11 | green << 6 | blue;
-}
+// Calculate 1 second increment angles. Hours and minute hand angles
+// change every second so we see smooth sub-pixel movement
+#define SECOND_ANGLE 360.0 / 60.0
+#define MINUTE_ANGLE SECOND_ANGLE / 60.0
+#define HOUR_ANGLE   MINUTE_ANGLE / 12.0
 
-void build_banner(String msg, int xpos)
-{
-  int h = IHEIGHT;
+// Sprite width and height
+#define FACE_W CLOCK_R * 2 + 1
+#define FACE_H CLOCK_R * 2 + 1
 
-  // We could just use fillSprite(color) but lets be a bit more creative...
+// Time h:m:s
+uint8_t h = 0, m = 0, s = 0;
 
-  // Fill with rainbow stripes
-  while (h--) img.drawFastHLine(0, h, IWIDTH, rainbow(h * 4));
+float time_secs = h * 3600 + m * 60 + s;
 
-  // Draw some graphics, the text will apear to scroll over these
-  img.fillRect  (IWIDTH / 2 - 20, IHEIGHT / 2 - 10, 40, 20, TFT_YELLOW);
-  img.fillCircle(IWIDTH / 2, IHEIGHT / 2, 10, TFT_ORANGE);
+// Load header after time_secs global variable has been created so it is in scope
+#include "NTP_Time.h" // Attached to this sketch, see that tab for library needs
 
-  // Now print text on top of the graphics
-  img.setTextSize(1);           // Font size scaling is x1
-  img.setTextFont(4);           // Font 4 selected
-  img.setTextColor(TFT_BLACK);  // Black text, no background colour
-  img.setTextWrap(false);       // Turn of wrap so we can print past end of sprite
+// Time for next tick
+uint32_t targetTime = 0;
 
-  // Need to print twice so text appears to wrap around at left and right edges
-  img.setCursor(xpos, 2);  // Print text at xpos
-  img.print(msg);
+static void renderFace(float t);
+void getCoord(int16_t x, int16_t y, float *xp, float *yp, int16_t r, float a);
 
-  img.setCursor(xpos - IWIDTH, 2); // Print text at xpos - sprite width
-  img.print(msg);
-}
-
-// #########################################################################
-// Create sprite, plot graphics in it, plot to screen, then delete sprite
-// #########################################################################
-void numberBox(int num, int x, int y)
-{
-  // Create a sprite 80 pixels wide, 50 high (8kbytes of RAM needed)
-  img.createSprite(80, 50);
-
-  // Fill it with black
-  img.fillSprite(TFT_BLACK);
-
-  // Draw a backgorund of 2 filled triangles
-  img.fillTriangle(  0, 0,  0, 49, 40, 25, TFT_RED);
-  img.fillTriangle( 79, 0, 79, 49, 40, 25, TFT_DARKGREEN);
-
-  // Set the font parameters
-  img.setTextSize(1);           // Font size scaling is x1
-  img.setFreeFont(&FreeSerifBoldItalic24pt7b);  // Select free font
-  img.setTextColor(TFT_WHITE);  // White text, no background colour
-
-  // Set text coordinate datum to middle centre
-  img.setTextDatum(MC_DATUM);
-
-  // Draw the number in middle of 80 x 50 sprite
-  img.drawNumber(num, 40, 25);
-
-  // Push sprite to TFT screen CGRAM at coordinate x,y (top left corner)
-  img.pushSprite(x, y);
-
-  // Delete sprite to free up the RAM
-  img.deleteSprite();
-}
-
-// -------------------------------------------------------------------------
+// =========================================================================
 // Setup
-// -------------------------------------------------------------------------
-void setup(void) {
-  tft.init();
-  tft.setRotation(0);
+// =========================================================================
+void setup() {
+  Serial.begin(115200);
+  Serial.println("Booting...");
 
-  tft.fillScreen(TFT_BLUE);
-  Serial.begin(9600);
-  Serial.println("String de teste");
+  // Initialise the screen
+  tft.init();
+
+  // Ideally set orientation for good viewing angle range because
+  // the anti-aliasing effectiveness varies with screen viewing angle
+  // Usually this is when screen ribbon connector is at the bottom
+  tft.setRotation(0);
+  tft.fillScreen(TFT_BLACK);
+
+  // Create the clock face sprite
+  //face.setColorDepth(8); // 8 bit will work, but reduces effectiveness of anti-aliasing
+  face.createSprite(FACE_W, FACE_H);
+
+  // Only 1 font used in the sprite, so can remain loaded
+  face.loadFont(NotoSansBold15);
+
+  // Draw the whole clock - NTP time not available yet
+  renderFace(time_secs);
+
+  targetTime = millis() + 100;
 }
 
-// -------------------------------------------------------------------------
-// Main loop
-// -------------------------------------------------------------------------
+// =========================================================================
+// Loop
+// =========================================================================
 void loop() {
+  // Update time periodically
+  if (targetTime < millis()) {
 
-  while (1)
-  {
-    // Create the sprite and clear background to black
-    img.createSprite(IWIDTH, IHEIGHT);
-    //img.fillSprite(TFT_BLACK); // Optional here as we fill the sprite later anyway
+    // Update next tick time in 100 milliseconds for smooth movement
+    targetTime = millis() + 100;
 
-    for (int pos = IWIDTH; pos > 0; pos--)
-    {
-      build_banner("Hello World", pos);
-      img.pushSprite(0, 0);
+    // Increment time by 100 milliseconds
+    time_secs += 0.100;
 
-      build_banner("TFT_eSPI sprite" , pos);
-      img.pushSprite(0, 50);
+    // Midnight roll-over
+    if (time_secs >= (60 * 60 * 24)) time_secs = 0;
 
-      delay(WAIT);
-    }
+    // All graphics are drawn in sprite to stop flicker
+    renderFace(time_secs);
 
-    // Delete sprite to free up the memory
-    img.deleteSprite();
-
-    // Create a sprite of a different size
-    numberBox(random(100), 60, 100);
-
+    // Request time from NTP server and synchronise the local clock
+    // (clock may pause since this may take >100ms)
+    syncTime();
   }
+}
+
+// =========================================================================
+// Draw the clock face in the sprite
+// =========================================================================
+static void renderFace(float t) {
+  float h_angle = t * HOUR_ANGLE;
+  float m_angle = t * MINUTE_ANGLE;
+  float s_angle = t * SECOND_ANGLE;
+
+  // The face is completely redrawn - this can be done quickly
+  face.fillSprite(TFT_BLACK);
+
+  // Draw the face circle
+  face.fillSmoothCircle( CLOCK_R, CLOCK_R, CLOCK_R, CLOCK_BG );
+
+  // Set text datum to middle centre and the colour
+  face.setTextDatum(MC_DATUM);
+
+  // The background colour will be read during the character rendering
+  face.setTextColor(CLOCK_FG, CLOCK_BG);
+
+  // Text offset adjustment
+  constexpr uint32_t dialOffset = CLOCK_R - 10;
+
+  float xp = 0.0, yp = 0.0; // Use float pixel position for smooth AA motion
+
+  // Draw digits around clock perimeter
+  for (uint32_t h = 1; h <= 12; h++) {
+    getCoord(CLOCK_R, CLOCK_R, &xp, &yp, dialOffset, h * 360.0 / 12);
+    face.drawNumber(h, xp, 2 + yp);
+  }
+
+  // Add text (could be digital time...)
+  face.setTextColor(LABEL_FG, CLOCK_BG);
+  face.drawString("TFT_eSPI", CLOCK_R, CLOCK_R * 0.75);
+
+  // Draw minute hand
+  getCoord(CLOCK_R, CLOCK_R, &xp, &yp, M_HAND_LENGTH, m_angle);
+  face.drawWideLine(CLOCK_R, CLOCK_R, xp, yp, 6.0f, CLOCK_FG);
+  face.drawWideLine(CLOCK_R, CLOCK_R, xp, yp, 2.0f, CLOCK_BG);
+
+  // Draw hour hand
+  getCoord(CLOCK_R, CLOCK_R, &xp, &yp, H_HAND_LENGTH, h_angle);
+  face.drawWideLine(CLOCK_R, CLOCK_R, xp, yp, 6.0f, CLOCK_FG);
+  face.drawWideLine(CLOCK_R, CLOCK_R, xp, yp, 2.0f, CLOCK_BG);
+
+  // Draw the central pivot circle
+  face.fillSmoothCircle(CLOCK_R, CLOCK_R, 4, CLOCK_FG);
+
+  // Draw cecond hand
+  getCoord(CLOCK_R, CLOCK_R, &xp, &yp, S_HAND_LENGTH, s_angle);
+  face.drawWedgeLine(CLOCK_R, CLOCK_R, xp, yp, 2.5, 1.0, SECCOND_FG);
+  face.pushSprite(5, 5, TFT_TRANSPARENT);
+}
+
+// =========================================================================
+// Get coordinates of end of a line, pivot at x,y, length r, angle a
+// =========================================================================
+// Coordinates are returned to caller via the xp and yp pointers
+#define DEG2RAD 0.0174532925
+void getCoord(int16_t x, int16_t y, float *xp, float *yp, int16_t r, float a)
+{
+  float sx1 = cos( (a - 90) * DEG2RAD);
+  float sy1 = sin( (a - 90) * DEG2RAD);
+  *xp =  sx1 * r + x;
+  *yp =  sy1 * r + y;
 }
