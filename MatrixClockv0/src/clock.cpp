@@ -8,8 +8,6 @@
 // // https://github.com/Bodmer/TFT_eSPI/issues/905
 
 // #include "WiFiManager.h"
-// //#define WIFI_SSID      "SGEVL_WLAN"
-// //#define WIFI_PASSWORD  "sgevl2050"
 
 // #include <Arduino.h>
 // #include <TFT_eSPI.h> // Master copy here: https://github.com/Bodmer/TFT_eSPI
