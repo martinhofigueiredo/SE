@@ -1,0 +1,12 @@
+{
+	"folders": [
+		{
+			"path": "../../../PlatformIO/Projects/MatrixClockv2"
+		},
+		{
+			"name": "MatrixClockv0",
+			"path": "."
+		}
+	],
+	"settings": {}
+}

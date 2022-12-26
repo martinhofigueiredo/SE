@@ -38,7 +38,8 @@ WiFiUDP udp;
 // (use a pool server in your own country to improve response time and reliability)
 //const char* ntpServerName = "time.nist.gov";
 //const char* ntpServerName = "pool.ntp.org";
-const char* ntpServerName = "time.google.com";
+//const char* ntpServerName = "time.google.com";
+const char* ntpServerName = "ntp.inesctec.pt";
 #else
 // Try to use pool url instead so the server IP address is looked up from those available
 // (use a pool server in your own country to improve response time and reliability)
@@ -142,27 +143,15 @@ void syncTime(void)
   if (ntp_start) {  // Run once
 
     // Call once for ESP32 and ESP8266
-    #if !defined(ARDUINO_ARCH_MBED)
-    WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-    #endif
-
-    while (WiFi.status() != WL_CONNECTED) {
-      Serial.print(".");
-      #if defined(ARDUINO_ARCH_MBED) || defined(ARDUINO_ARCH_RP2040)
-      if (WiFi.status() != WL_CONNECTED) WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-      #endif
-      delay(500);
-    }
     Serial.println();
-
     udp.begin(localPort); ntp_start = 0;
   }
 
   // Don't send too often so we don't trigger Denial of Service
   if (nextSendTime < millis()) {
 
-    // Wait 1 hour for next sync
-    nextSendTime = millis() + 60 * 60 * 1000;
+    // Wait 1 hour for next sync, 1 minute now
+    nextSendTime = millis() + 60 * 1000; //60 * 1000;
 
     // Get a random server from the pool
     WiFi.hostByName(ntpServerName, timeServerIP);
@@ -175,8 +164,8 @@ void syncTime(void)
       nextSendTime = millis() + 60 * 1000;
     }
     else {
-      // Wait 1 hour for next sync
-      nextSendTime = millis() + 60 * 60 * 1000;
+      // Wait 5 minutes for next sync
+      nextSendTime = millis() + 60 * 1000 * 5;
     }
   }
 }
