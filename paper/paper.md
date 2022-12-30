@@ -14,7 +14,7 @@ lineno: false
 abbreviation:
   - RTOS, real time operationg system
 abstract: |
-  In this project we will create and evaluate a small game controller and display based on a ESP32 Microcontroller 
+  In this project we will create and evaluate a small game controller and display based on a ESP32 Microcontroller
 bibliography: references.bib
 template: scientific_reports
 documentclass_options: 
