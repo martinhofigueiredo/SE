@@ -3,11 +3,20 @@
 #include "igraLORA.hpp"
 
 loraGame lora;
+char buffer;
+
 
 TaskHandle_t loraHandle = NULL;
+TaskHandle_t timingHandle = NULL;
 
 void lora_task(void* parameter){
     lora.game_routine();
+}
+
+void timing_task(void* parameter){
+    vTaskGetRunTimeStats(&buffer);
+    Serial.println(buffer);
+    vTaskDelete(timingHandle);   
 }
 
 void setup()
