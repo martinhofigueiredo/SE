@@ -10,6 +10,7 @@ clockApp smart_clock;
 AlienAttack alien;
 
 char* buffer[256];
+int counter = 0;
 
 TaskHandle_t loraHandle = NULL;
 TaskHandle_t timingHandle = NULL;
@@ -41,13 +42,14 @@ void timing_task(void* parameter){
 }
 
 void touchCS_task(void* parameter){
-    vTaskGetRunTimeStats(* buffer);
-    Serial.println(*buffer);
-    vTaskDelete(timingHandle);   
+  if(digitalRead(27)){
+    counter++;
+  }   
 }
 
 void setup()
 {
+    pinMode(27, INPUT);
     Serial.begin(9600);
     alien.game_setup();
     lora.game_setup();
@@ -74,7 +76,7 @@ void setup()
   //);
 }
 
-int counter = 0;
+
 
 void loop()
 {
