@@ -106,9 +106,9 @@ bool timeValid = false;
 
 unsigned int localPort = 2390;      // local port to listen for UDP packets
 
-const int NTP_PACKET_SIZE = 48; // NTP time stamp is in the first 48 bytes of the message
+const int ntp_packet_size = 48; // NTP time stamp is in the first 48 bytes of the message
 
-byte packetBuffer[ NTP_PACKET_SIZE ]; //buffer to hold incoming and outgoing packets
+byte packetBuffer[ ntp_packet_size ]; //buffer to hold incoming and outgoing packets
 
 uint8_t lastMinute = 0;
 
@@ -177,7 +177,7 @@ void sendNTPpacket(IPAddress& address)
 {
   // Serial.println("sending NTP packet...");
   // set all bytes in the buffer to 0
-  memset(packetBuffer, 0, NTP_PACKET_SIZE);
+  memset(packetBuffer, 0, ntp_packet_size);
   // Initialize values needed to form NTP request
   // (see URL above for details on the packets)
   packetBuffer[0] = 0b11100011;   // LI, Version, Mode
@@ -195,7 +195,7 @@ void sendNTPpacket(IPAddress& address)
   // all NTP fields have been given values, now
   // you can send a packet requesting a timestamp:
   udp.beginPacket(address, 123); //NTP requests are to port 123
-  udp.write(packetBuffer, NTP_PACKET_SIZE);
+  udp.write(packetBuffer, ntp_packet_size);
   udp.endPacket();
 }
 
@@ -214,7 +214,7 @@ void decodeNTP(void)
       newRecvTime = millis();
 
       // We've received a packet, read the data from it
-      udp.read(packetBuffer, NTP_PACKET_SIZE); // read the packet into the buffer
+      udp.read(packetBuffer, ntp_packet_size); // read the packet into the buffer
 
       Serial.print("\nNTP response time was : ");
       Serial.print(500 - (waitTime - newRecvTime));
