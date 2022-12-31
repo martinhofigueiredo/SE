@@ -36,14 +36,15 @@ void weather_task(void* parameter){
 }
 
 void timing_task(void* parameter){
-    vTaskGetRunTimeStats(* buffer);
-    Serial.println(*buffer);
-    vTaskDelete(timingHandle);   
+    //vTaskGetRunTimeStats(* buffer);
+    //Serial.println(*buffer);
+    //vTaskDelete(timingHandle);   
 }
 
 void touchCS_task(void* parameter){
   if(digitalRead(27)){
     counter++;
+    Serial.println("TOUCHED PIN 27");
   }   
 }
 
@@ -61,19 +62,19 @@ void setup()
     "Lora Game Task",   // Name of the task (for debugging)
     1000,            // Stack size (bytes) Need to know if is enough
     NULL,            // Parameter to pass
-    2,               // Task priority
+    1,               // Task priority
     &loraHandle             // Task handle
   );
 
-    //xTaskCreatePinnedToCore(
-    //timing_task,    // Function that should be called
-    //"Timing Task",   // Name of the task (for debugging)
-    //1000,            // Stack size (bytes) Need to know if is enough
-    //NULL,            // Parameter to pass
-    //1,               // Task priority
-    //&timingHandle,             // Task handle
-    //1 // Core 1
-  //);
+    xTaskCreate(
+    weather_task,    // Function that should be called
+    "Weather Task",   // Name of the task (for debugging)
+    2000,            // Stack size (bytes) Need to know if is enough
+    NULL,            // Parameter to pass
+    1,               // Task priority
+    &weatherHandle             // Task handle
+  );
+
 }
 
 
@@ -82,15 +83,35 @@ void loop()
 {
   switch(counter){
     case 0:{
+      vTaskSuspend(&loraHandle);
+      vTaskSuspend(&timingHandle);
+      vTaskSuspend(&smartclockHandle);
+      vTaskSuspend(&weatherHandle);
+      vTaskResume(&alienHandle);
       //alien.game_routine();
     }
     case 1:{
+      vTaskSuspend(&timingHandle);
+      vTaskSuspend(&alienHandle);
+      vTaskSuspend(&smartclockHandle);
+      vTaskSuspend(&weatherHandle);
+      vTaskResume(&loraHandle);
       //lora.game_routine();
     }
     case 2:{
+      vTaskSuspend(&loraHandle);
+      vTaskSuspend(&timingHandle);
+      vTaskSuspend(&alienHandle);
+      vTaskSuspend(&weatherHandle);
+      vTaskResume(&smartclockHandle);
       //smart_clock.clock_routine();
     }
     case 3:{
+      vTaskSuspend(&loraHandle);
+      vTaskSuspend(&timingHandle);
+      vTaskSuspend(&alienHandle);
+      vTaskSuspend(&smartclockHandle);
+      vTaskResume(&weatherHandle);
       //weather.weather_routine();
     }
     case 4:{
