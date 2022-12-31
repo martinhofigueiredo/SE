@@ -292,8 +292,6 @@ void restart()
 
 };
 
-AlienAttack alien;
-
 // void setup()
 // {
 //   alien.game_setup();
