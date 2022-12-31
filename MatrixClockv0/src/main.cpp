@@ -1,8 +1,6 @@
 #include <Arduino.h>
 #include "TTGOAlienAttack.hpp"
 #include "igraLORA.hpp"
-#include "clock_app.hpp"
-#include "weather_app.hpp"
 
 loraGame lora;
 weatherApp weather;
@@ -35,11 +33,20 @@ void setup()
     xTaskCreate(
     lora_task,    // Function that should be called
     "Lora Game Task",   // Name of the task (for debugging)
-    10000,            // Stack size (bytes) Need to know if is enough
+    1000,            // Stack size (bytes) Need to know if is enough
     NULL,            // Parameter to pass
-    1,               // Task priority
+    2,               // Task priority
     &loraHandle             // Task handle
   );
+    //xTaskCreatePinnedToCore(
+    //timing_task,    // Function that should be called
+    //"Timing Task",   // Name of the task (for debugging)
+    //1000,            // Stack size (bytes) Need to know if is enough
+    //NULL,            // Parameter to pass
+    //1,               // Task priority
+    //&timingHandle,             // Task handle
+    //1 // Core 1
+  //);
 }
 
 void loop()
