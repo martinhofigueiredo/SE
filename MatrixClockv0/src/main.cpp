@@ -2,6 +2,7 @@
 #include "TTGOAlienAttack.hpp"
 #include "igraLORA.hpp"
 
+
 loraGame lora;
 char buffer;
 
@@ -23,13 +24,23 @@ void setup()
 {
     //alien.game_setup();
     lora.game_setup();
-    xTaskCreate(
+    xTaskCreatePinnedToCore(
     lora_task,    // Function that should be called
     "Lora Game Task",   // Name of the task (for debugging)
     1000,            // Stack size (bytes) Need to know if is enough
     NULL,            // Parameter to pass
+    2,               // Task priority
+    &loraHandle,             // Task handle
+    0                   // Core zero
+  );
+    xTaskCreatePinnedToCore(
+    timing_task,    // Function that should be called
+    "Timing Task",   // Name of the task (for debugging)
+    1000,            // Stack size (bytes) Need to know if is enough
+    NULL,            // Parameter to pass
     1,               // Task priority
-    &loraHandle             // Task handle
+    &timingHandle,             // Task handle
+    1 // Core 1
   );
 }
 

@@ -165,7 +165,7 @@ void restart()
     tft.setSwapBytes(true); 
     
     ledcSetup(pwmLedChannelTFT, pwmFreq, pwmResolution);
-    ledcAttachPin(TFT_BL, pwmLedChannelTFT);
+    ledcAttachPin(TFT_BLUE, pwmLedChannelTFT);
     ledcWrite(pwmLedChannelTFT, 100);
     pinMode(0,INPUT_PULLUP);
     pinMode(35,INPUT_PULLUP);
