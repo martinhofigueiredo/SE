@@ -1,6 +1,8 @@
 #include <Arduino.h>
 #include "TTGOAlienAttack.hpp"
 #include "igraLORA.hpp"
+#include "weather_app.hpp"
+#include "clock_app.hpp"
 
 loraGame lora;
 weatherApp weather;
