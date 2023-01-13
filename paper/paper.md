@@ -34,11 +34,11 @@ References are cited as @mittner2014brain or [@mittner2014brain].
 
 # Methods
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+We tried to structure the code for the functions we wanted to develop in a "apps" a  class object that has a `setup` method that handles all the configuration of the microcontroller and a `routine` method that is the iterated on to update the app.
 
-- some
-- bullet
-- points
+These were then placed on freeRTOS task scheduler which was controlled firstly in a round-robin to make sure every task was sucesseful run at least once so we could time it
+
+To get the timing results of each task we used the freeRTOS timing API to return the value of 
 
 Footnotes can be entered using this code[^1].
 

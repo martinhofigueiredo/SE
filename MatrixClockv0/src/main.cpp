@@ -3,6 +3,7 @@
 #include "igraLORA.hpp"
 #include "weather_app.hpp"
 #include "clock_app.hpp"
+#include "arduino/freertos.h"
 
 loraGame lora;
 weatherApp weather;

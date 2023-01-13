@@ -12,7 +12,7 @@
 #include <HTTPClient.h>
 
 #define TFT_GREY 0x5AEB
-#define lightblue 0x01E9
+#define lightblue2 0x01E9
 #define darkred 0xA041
 #define blue 0x5D9B
 
@@ -97,9 +97,8 @@ public:
       tft.setRotation(0);
       tft.fillScreen(TFT_BLACK);
       tft.setTextColor(TFT_WHITE,TFT_BLACK);  tft.setTextSize(1);
-
       ledcSetup(pwmLedChannelTFT, pwmFreq, pwmResolution);
-      ledcAttachPin(TFT_BL, pwmLedChannelTFT);
+      ledcAttachPin(TFT_BLUE, pwmLedChannelTFT);
       ledcWrite(pwmLedChannelTFT, backlight[b]);
 
       Serial.begin(9600);
@@ -138,7 +137,7 @@ public:
 
       tft.setCursor(80, 152, 2);
       tft.println("SEC:");
-      tft.setTextColor(TFT_WHITE,lightblue);
+      tft.setTextColor(TFT_WHITE,lightblue2);
       tft.setCursor(4, 152, 2);
       tft.println("TEMP:");
 
