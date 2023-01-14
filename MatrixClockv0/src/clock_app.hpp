@@ -65,8 +65,9 @@ void getCoord(int16_t x, int16_t y, float *xp, float *yp, int16_t r, float a)
 }
 
 class clockApp{
+  
 public:
-  TFT_eSprite face = TFT_eSprite(&tft);
+  static TFT_eSprite clockApp::face = TFT_eSprite(&tft);
   // Time for next tick
   uint32_t targetTime = 0;
 
@@ -126,7 +127,7 @@ public:
   // =========================================================================
   // Draw the clock face in the sprite
   // =========================================================================
-  static void renderFace(float t, TFT_eSprite *face) { //TODO: Find how to pass by reference a variable in cpp
+  static void renderFace(float t) { //TODO: Find how to pass by reference a variable in cpp
     float h_angle = t * HOUR_ANGLE;
     float m_angle = t * MINUTE_ANGLE;
     float s_angle = t * SECOND_ANGLE;
@@ -184,33 +185,33 @@ public:
     
     Serial.println("Booting...");
 
-    // Initialise the screen
-    tft.init();
+    // // Initialise the screen
+    // tft.init();
 
-    // Ideally set orientation for good viewing angle range because
-    // the anti-aliasing effectiveness varies with screen viewing angle
-    // Usually this is when screen ribbon connector is at the bottom
-    tft.setRotation(0);
-    tft.fillScreen(TFT_BLACK);
+    // // Ideally set orientation for good viewing angle range because
+    // // the anti-aliasing effectiveness varies with screen viewing angle
+    // // Usually this is when screen ribbon connector is at the bottom
+    // tft.setRotation(0);
+    // tft.fillScreen(TFT_BLACK);
 
-    // Create the clock face sprite
-    //face.setColorDepth(8); // 8 bit will work, but reduces effectiveness of anti-aliasing
-    face.createSprite(FACE_W, FACE_H);
+    // // Create the clock face sprite
+    // //face.setColorDepth(8); // 8 bit will work, but reduces effectiveness of anti-aliasing
+    // face.createSprite(FACE_W, FACE_H);
 
-    // Only 1 font used in the sprite, so can remain loaded
-    face.loadFont(NotoSansBold15);
+    // // Only 1 font used in the sprite, so can remain loaded
+    // face.loadFont(NotoSansBold15);
 
-    // The face is completely redrawn - this can be done quickly
-    face.fillSprite(TFT_BLACK);
+    // // The face is completely redrawn - this can be done quickly
+    // face.fillSprite(TFT_BLACK);
     
-    // Set text datum to middle centre and the colour
-    face.setTextDatum(MC_DATUM);
+    // // Set text datum to middle centre and the colour
+    // face.setTextDatum(MC_DATUM);
 
-    // Add text (could be digital time...)
-    face.setTextColor(LABEL_FG, CLOCK_BG);
-    face.drawString("SMART CLOCK", CLOCK_R, CLOCK_R * 0.75);
+    // // Add text (could be digital time...)
+    // face.setTextColor(LABEL_FG, CLOCK_BG);
+    // face.drawString("SMART CLOCK", CLOCK_R, CLOCK_R * 0.75);
 
-    face.pushSprite(5,80, TFT_TRANSPARENT);
+    // face.pushSprite(5,80, TFT_TRANSPARENT);
 
     //tft.drawCentreString("Connecting to WIFI",0,8,NotoSansBold15)
 
@@ -230,6 +231,7 @@ public:
     // }
     // else
     //   Serial.println("Connected");
+    delay(1);
       
     // Initialise the screen
     tft.init();
@@ -247,7 +249,7 @@ public:
     face.loadFont(NotoSansBold15);
 
     // Draw the whole clock - NTP time not available yet
-    renderFace(time_secs, face);
+    renderFace(time_secs);
 
     targetTime = millis() + 100;
   }
@@ -267,8 +269,8 @@ public:
       if (time_secs >= (60 * 60 * 24)) time_secs = 0;
 
       // All graphics are drawn in sprite to stop flicker
-      renderFace(time_secs, face);
-      renderDigitalClock(time_secs, face);
+      renderFace(time_secs);
+      renderDigitalClock(time_secs);
 
       // Request time from NTP server and synchronise the local clock
       // (clock may pause since this may take >100ms)

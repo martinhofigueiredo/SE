@@ -21,22 +21,25 @@ class loraGame{
   float xs=amount[random(4)]*vrije[random(2)];
   int fase=0;
 
-  void game_setup(void) {
+  int game_set(void) 
+  {
+      Serial.println("Entrei na game_setup() lora");
       pinMode(0,INPUT);
       pinMode(35,INPUT);
       tft.init();
       tft.setRotation(0);
       tft.setSwapBytes(true);
       tft.pushImage(0, 0,  135, 240, bootlogo);
-    }
+      return 1;
+  }
 
   float xstep=1;
   int spe=0;
   int pom=0;
   int gameSpeed=7000;
 
-  void game_routine() {
-
+  int game_routine() {
+    Serial.println("Entrein na game_routine() lora");
     if(fase==0)
     {
       
@@ -165,8 +168,8 @@ class loraGame{
     
     delay(3000);
     }
-
-    }
+    return 1;
+  }
 
   void newLevel()
   {

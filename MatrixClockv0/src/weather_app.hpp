@@ -11,51 +11,11 @@
 #include <WiFiUdp.h>
 #include <HTTPClient.h>
 
-<<<<<<< Updated upstream
-#define TFT_GREY 0x5AEB
-#define lightblue2 0x01E9
-#define darkred 0xA041
-#define blue 0x5D9B
-
-// Define NTP Client to get time
 WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP);
 
-=======
->>>>>>> Stashed changes
 class weatherApp{
-public:
-  // Define NTP Client to get time
-  WiFiUDP ntpUDP;
-  NTPClient timeClient(weatherApp::ntpUDP);
-  int frames=10;
-  int animation_width=135;
-  int animation_height=65;
-
-  const int pwmFreq = 5000;
-  const int pwmResolution = 8;
-  const int pwmLedChannelTFT = 0;
-
-  String town="Porto";              //EDDIT
-  String Country="PT";                //EDDIT
-  const String endpoint = "http://api.openweathermap.org/data/2.5/weather?q="+town+","+Country+"&units=metric&APPID=";
-  const String key = "6ff582050aaa7a4f567c608b4435ce9a"; /*EDDITTTTTTTTTTTTTTTTTTTTTTTT                      */
-
-  String payload=""; //whole json 
-  String tmp="" ; //temperatur
-  String hum="" ; //humidity
-
-  StaticJsonDocument<1000> doc;
-
-  // Variables to save date and time
-  String formattedDate;
-  String dayStamp;
-  String timeStamp;
-
-  int backlight[5] = {10,30,60,120,220};
-  byte b=1;
-
-  void getData()
+void getData()
   {
       tft.fillRect(1,170,64,20,TFT_BLACK);
       tft.fillRect(1,210,64,20,TFT_BLACK);
@@ -95,8 +55,37 @@ public:
     Serial.println(town);
     
   }
+public:
+  // Define NTP Client to get time
+  int frames=10;
+  int animation_width=135;
+  int animation_height=65;
 
-  void weather_setup(void) {
+  const int pwmFreq = 5000;
+  const int pwmResolution = 8;
+  const int pwmLedChannelTFT = 0;
+
+  String town="Porto";              //EDDIT
+  String Country="PT";                //EDDIT
+  const String endpoint = "http://api.openweathermap.org/data/2.5/weather?q="+town+","+Country+"&units=metric&APPID=";
+  const String key = "6ff582050aaa7a4f567c608b4435ce9a"; /*EDDITTTTTTTTTTTTTTTTTTTTTTTT                      */
+
+  String payload=""; //whole json 
+  String tmp="" ; //temperatur
+  String hum="" ; //humidity
+
+  StaticJsonDocument<1000> doc;
+
+  // Variables to save date and time
+  String formattedDate;
+  String dayStamp;
+  String timeStamp;
+
+  int backlight[5] = {10,30,60,120,220};
+  byte b=1;
+
+  int weather_set(void) {
+    Serial.println("Entrein na weather_setup");
       pinMode(0,INPUT_PULLUP);
       pinMode(35,INPUT);
       tft.init();
@@ -107,7 +96,6 @@ public:
       ledcAttachPin(TFT_BLUE, pwmLedChannelTFT);
       ledcWrite(pwmLedChannelTFT, backlight[b]);
 
-      Serial.begin(9600);
       // tft.print("Connecting to Internet");
       // //tft.println(ssid);
       // WiFi.mode(WIFI_STA);
@@ -143,7 +131,7 @@ public:
 
       tft.setCursor(80, 152, 2);
       tft.println("SEC:");
-      tft.setTextColor(TFT_WHITE,lightblue2);
+      tft.setTextColor(TFT_WHITE,lightblue);
       tft.setCursor(4, 152, 2);
       tft.println("TEMP:");
 
@@ -170,6 +158,7 @@ public:
       timeClient.setTimeOffset(0);   /*EDDITTTTTTTTTTTTTTTTTTTTTTTT                      */
       getData();
       delay(500);
+      return 1;
   }
   int i=0;
   String tt="";
@@ -181,8 +170,8 @@ public:
   int frame=0;
   String curSeconds="";
 
-  void weather_routine() {
-
+  int weather_routine() {
+    Serial.println("Entrei na wheather_routine()");
     tft.pushImage(0, 88,  135, 65, ani1[frame]);
     frame++;
     if(frame>=10)
@@ -263,7 +252,9 @@ public:
           }
     
     delay(80);
+    return 1;
   }
+
 };     
 
      
