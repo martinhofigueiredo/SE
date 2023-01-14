@@ -11,6 +11,7 @@
 #include <WiFiUdp.h>
 #include <HTTPClient.h>
 
+<<<<<<< Updated upstream
 #define TFT_GREY 0x5AEB
 #define lightblue2 0x01E9
 #define darkred 0xA041
@@ -20,8 +21,13 @@
 WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP);
 
+=======
+>>>>>>> Stashed changes
 class weatherApp{
 public:
+  // Define NTP Client to get time
+  WiFiUDP ntpUDP;
+  NTPClient timeClient(weatherApp::ntpUDP);
   int frames=10;
   int animation_width=135;
   int animation_height=65;
@@ -37,7 +43,7 @@ public:
 
   String payload=""; //whole json 
   String tmp="" ; //temperatur
-    String hum="" ; //humidity
+  String hum="" ; //humidity
 
   StaticJsonDocument<1000> doc;
 
@@ -102,29 +108,29 @@ public:
       ledcWrite(pwmLedChannelTFT, backlight[b]);
 
       Serial.begin(9600);
-      tft.print("Connecting to Internet");
-      //tft.println(ssid);
-      WiFi.mode(WIFI_STA);
+      // tft.print("Connecting to Internet");
+      // //tft.println(ssid);
+      // WiFi.mode(WIFI_STA);
 
-      WiFiManager wm;
-      // wm.resetSettings(); // Comment for production
+      // WiFiManager wm;
+      // // wm.resetSettings(); // Comment for production
 
-      bool auto_connect_res;
-      auto_connect_res = wm.autoConnect("weather AP connect");
-      if(!auto_connect_res)
-      {
-      Serial.println("Failed to connect");
-      tft.println("");
-      tft.println("Failed to connect");
-      WiFi.setAutoReconnect(true);
-      // ESP.restart();
-      }
-      else
-      Serial.println("Connected");
-      tft.println("");
-      tft.println("WiFi connected.");
-      tft.println("IP address: ");
-      tft.println(WiFi.localIP());
+      // bool auto_connect_res;
+      // auto_connect_res = wm.autoConnect("weather AP connect");
+      // if(!auto_connect_res)
+      // {
+      // Serial.println("Failed to connect");
+      // tft.println("");
+      // tft.println("Failed to connect");
+      // WiFi.setAutoReconnect(true);
+      // // ESP.restart();
+      // }
+      // else
+      // Serial.println("Connected");
+      // tft.println("");
+      // tft.println("WiFi connected.");
+      // tft.println("IP address: ");
+      // tft.println(WiFi.localIP());
       delay(3000);
       tft.setTextColor(TFT_WHITE,TFT_BLACK);  tft.setTextSize(1);
       tft.fillScreen(TFT_BLACK);

@@ -16,7 +16,6 @@
 #include "NotoSansBold15.h"
 
 //TFT_eSPI tft = TFT_eSPI();  // Invoke library, pins defined in User_Setup.h
-TFT_eSprite face = TFT_eSprite(&tft);
 
 #define CLOCK_X_POS 10
 #define CLOCK_Y_POS 10
@@ -67,6 +66,7 @@ void getCoord(int16_t x, int16_t y, float *xp, float *yp, int16_t r, float a)
 
 class clockApp{
 public:
+  TFT_eSprite face = TFT_eSprite(&tft);
   // Time for next tick
   uint32_t targetTime = 0;
 
@@ -110,7 +110,7 @@ public:
   static void renderDigitalClock(float t)
   {
     String dig_num = "00:00:00";
-    
+
     face.createSprite(FACE_W, FACE_H);
     // The face is completely redrawn - this can be done quickly
     face.fillSprite(TFT_BLACK);
@@ -126,7 +126,7 @@ public:
   // =========================================================================
   // Draw the clock face in the sprite
   // =========================================================================
-  static void renderFace(float t) {
+  static void renderFace(float t, TFT_eSprite *face) { //TODO: Find how to pass by reference a variable in cpp
     float h_angle = t * HOUR_ANGLE;
     float m_angle = t * MINUTE_ANGLE;
     float s_angle = t * SECOND_ANGLE;
@@ -181,9 +181,7 @@ public:
   // Setup
   // =========================================================================
   void clock_setup() {
-    Serial.begin(9600);
-    while (!Serial)
-    ;
+    
     Serial.println("Booting...");
 
     // Initialise the screen
@@ -216,22 +214,22 @@ public:
 
     //tft.drawCentreString("Connecting to WIFI",0,8,NotoSansBold15)
 
-    WiFi.mode(WIFI_STA);
+    // WiFi.mode(WIFI_STA);
 
-    WiFiManager wm;
-    // wm.resetSettings(); // Comment for production
+    // WiFiManager wm;
+    // // wm.resetSettings(); // Comment for production
     
-    bool auto_connect_res;
-    auto_connect_res = wm.autoConnect("SmartClockWIFI");
+    // bool auto_connect_res;
+    // auto_connect_res = wm.autoConnect("SmartClockWIFI");
     
-    if(!auto_connect_res)
-    {
-      Serial.println("Failed to connect");
-      WiFi.setAutoReconnect(true);
-      // ESP.restart();
-    }
-    else
-      Serial.println("Connected");
+    // if(!auto_connect_res)
+    // {
+    //   Serial.println("Failed to connect");
+    //   WiFi.setAutoReconnect(true);
+    //   // ESP.restart();
+    // }
+    // else
+    //   Serial.println("Connected");
       
     // Initialise the screen
     tft.init();
@@ -249,7 +247,7 @@ public:
     face.loadFont(NotoSansBold15);
 
     // Draw the whole clock - NTP time not available yet
-    renderFace(time_secs);
+    renderFace(time_secs, face);
 
     targetTime = millis() + 100;
   }
@@ -269,8 +267,8 @@ public:
       if (time_secs >= (60 * 60 * 24)) time_secs = 0;
 
       // All graphics are drawn in sprite to stop flicker
-      renderFace(time_secs);
-      renderDigitalClock(time_secs);
+      renderFace(time_secs, face);
+      renderDigitalClock(time_secs, face);
 
       // Request time from NTP server and synchronise the local clock
       // (clock may pause since this may take >100ms)

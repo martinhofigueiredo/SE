@@ -1,10 +1,5 @@
 #include "common.hpp"
 #include "bmp.h"
-#define TFT_GREY 0x5AEB
-#define lightblue 0x2D18
-#define orange 0xFB60
-#define purple 0xFB9B
-
 
 class loraGame{
   public:
