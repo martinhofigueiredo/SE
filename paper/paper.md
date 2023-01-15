@@ -22,11 +22,10 @@ documentclass_options:
 ...
 
 # Introduction
-
-In this paper, we explore the differences between Arduino and FreeRTOS implementations for embedded systems. Arduino is an open-source electronics platform that is based on simple software and hardware. It is often used for prototyping and hobby projects, and it features a simplified programming environment and a large community of users. On the other hand, FreeRTOS is a real-time operating system (RTOS) that is designed for use in embedded systems. It is a small, lightweight, and customizable operating system that is designed to be easy to use and understand. The key differences between the two lie in the level of control and flexibility offered by each platform. Arduino is best suited for simple, single-threaded projects, while FreeRTOS is more suitable for larger, multi-threaded projects that require real-time performance. Overall, both Arduino and FreeRTOS have their own advantages and disadvantages and the choice of which to use will depend on the specific requirements of the project.
-
  The system we developed is intend to be used as a small digital clock with a few minigames. This serves as an example of a IoT device capable of displaying some up to date information like the weather.
 
+
+![This is gonna be the caption.](pic/bounceball.jpg){#fig:dummy }
 <!---
 Comments look like this and do not show up in the PDF
 
