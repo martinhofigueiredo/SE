@@ -1,0 +1,161 @@
+Processing ttgo-lora32-v1 (platform: espressif32; board: ttgo-lora32-v1; framework: arduino)
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Verbose mode can be enabled via `-v, --verbose` option
+CONFIGURATION: https://docs.platformio.org/page/boards/espressif32/ttgo-lora32-v1.html
+PLATFORM: Espressif 32 (5.2.0) > TTGO LoRa32-OLED V1
+HARDWARE: ESP32 240MHz, 320KB RAM, 4MB Flash
+DEBUG: Current (cmsis-dap) External (cmsis-dap, esp-bridge, esp-prog, iot-bus-jtag, jlink, minimodule, olimex-arm-usb-ocd, olimex-arm-usb-ocd-h, olimex-arm-usb-tiny-h, olimex-jtag-tiny, tumpa)
+PACKAGES: 
+ - framework-arduinoespressif32 @ 3.20005.220925 (2.0.5) 
+ - tool-esptoolpy @ 1.40201.0 (4.2.1) 
+ - tool-mkfatfs @ 2.0.1 
+ - tool-mklittlefs @ 1.203.210628 (2.3) 
+ - tool-mkspiffs @ 2.230.0 (2.30) 
+ - toolchain-xtensa-esp32 @ 8.4.0+2021r2-patch3
+LDF: Library Dependency Finder -> https://bit.ly/configure-pio-ldf
+LDF Modes: Finder ~ deep+, Compatibility ~ soft
+Found 40 compatible libraries
+Scanning dependencies...
+Dependency Graph
+|-- TFT_eSPI @ 2.4.79
+|   |-- SPI @ 2.0.0
+|   |-- FS @ 2.0.0
+|   |-- SPIFFS @ 2.0.0
+|   |   |-- FS @ 2.0.0
+|-- Timezone @ 1.2.4+sha.7cf1425
+|   |-- Time @ 1.6.1+sha.a18e50d
+|-- Time @ 1.6.1+sha.a18e50d
+|-- WiFiManager @ 2.0.15-rc.1+sha.297123b
+|   |-- WiFi @ 2.0.0
+|   |-- Update @ 2.0.0
+|   |-- WebServer @ 2.0.0
+|   |   |-- WiFi @ 2.0.0
+|   |   |-- FS @ 2.0.0
+|   |-- DNSServer @ 2.0.0
+|   |   |-- WiFi @ 2.0.0
+|-- NTPClient @ 3.1.0+sha.aafa4e1
+|-- ArduinoJson @ 6.19.4
+|-- SPI @ 2.0.0
+|-- FS @ 2.0.0
+|-- SPIFFS @ 2.0.0
+|   |-- FS @ 2.0.0
+|-- WiFi @ 2.0.0
+|-- Update @ 2.0.0
+|-- WebServer @ 2.0.0
+|   |-- WiFi @ 2.0.0
+|   |-- FS @ 2.0.0
+|-- DNSServer @ 2.0.0
+|   |-- WiFi @ 2.0.0
+|-- HTTPClient @ 2.0.0
+|   |-- WiFi @ 2.0.0
+|   |-- WiFiClientSecure @ 2.0.0
+|   |   |-- WiFi @ 2.0.0
+|-- WiFiClientSecure @ 2.0.0
+|   |-- WiFi @ 2.0.0
+Building in release mode
+Compiling .pio/build/ttgo-lora32-v1/src/main_rtos.cpp.o
+Linking .pio/build/ttgo-lora32-v1/firmware.elf
+Retrieving maximum program size .pio/build/ttgo-lora32-v1/firmware.elf
+Checking size .pio/build/ttgo-lora32-v1/firmware.elf
+Advanced Memory Usage is available via "PlatformIO Home > Project Inspect"
+RAM:   [=         ]  13.0% (used 42564 bytes from 327680 bytes)
+Flash: [==========]  99.6% (used 1305033 bytes from 1310720 bytes)
+Building .pio/build/ttgo-lora32-v1/firmware.bin
+esptool.py v4.2.1
+Creating esp32 image...
+Merged 25 ELF sections
+Successfully created esp32 image.
+Configuring upload protocol...
+AVAILABLE: cmsis-dap, esp-bridge, esp-prog, espota, esptool, iot-bus-jtag, jlink, minimodule, olimex-arm-usb-ocd, olimex-arm-usb-ocd-h, olimex-arm-usb-tiny-h, olimex-jtag-tiny, tumpa
+CURRENT: upload_protocol = esptool
+Looking for upload port...
+Auto-detected: /dev/cu.usbserial-02280638
+Uploading .pio/build/ttgo-lora32-v1/firmware.bin
+esptool.py v4.2.1
+Serial port /dev/cu.usbserial-02280638
+Connecting....
+Chip is ESP32-D0WDQ6-V3 (revision 3)
+Features: WiFi, BT, Dual Core, 240MHz, VRef calibration in efuse, Coding Scheme None
+Crystal is 40MHz
+MAC: 3c:61:05:0b:c6:48
+Uploading stub...
+Running stub...
+Stub running...
+Changing baud rate to 460800
+Changed.
+Configuring flash size...
+Flash will be erased from 0x00001000 to 0x00005fff...
+Flash will be erased from 0x00008000 to 0x00008fff...
+Flash will be erased from 0x0000e000 to 0x0000ffff...
+Flash will be erased from 0x00010000 to 0x00150fff...
+Compressed 17440 bytes to 12127...
+Writing at 0x00001000... (100 %)
+Wrote 17440 bytes (12127 compressed) at 0x00001000 in 0.7 seconds (effective 197.5 kbit/s)...
+Hash of data verified.
+Compressed 3072 bytes to 128...
+Writing at 0x00008000... (100 %)
+Wrote 3072 bytes (128 compressed) at 0x00008000 in 0.1 seconds (effective 281.9 kbit/s)...
+Hash of data verified.
+Compressed 8192 bytes to 47...
+Writing at 0x0000e000... (100 %)
+Wrote 8192 bytes (47 compressed) at 0x0000e000 in 0.2 seconds (effective 434.9 kbit/s)...
+Hash of data verified.
+Compressed 1310800 bytes to 752239...
+Writing at 0x00010000... (2 %)
+Writing at 0x000186ae... (4 %)
+Writing at 0x00023c3c... (6 %)
+Writing at 0x0002cfe2... (8 %)
+Writing at 0x00036642... (10 %)
+Writing at 0x0004800f... (13 %)
+Writing at 0x00054010... (15 %)
+Writing at 0x0005f407... (17 %)
+Writing at 0x0006a7e2... (19 %)
+Writing at 0x00074afd... (21 %)
+Writing at 0x00084a3a... (23 %)
+Writing at 0x0008a930... (26 %)
+Writing at 0x0008ff23... (28 %)
+Writing at 0x00095c1a... (30 %)
+Writing at 0x0009b223... (32 %)
+Writing at 0x000a262e... (34 %)
+Writing at 0x000a8a05... (36 %)
+Writing at 0x000ae313... (39 %)
+Writing at 0x000b36c0... (41 %)
+Writing at 0x000b92c4... (43 %)
+Writing at 0x000be642... (45 %)
+Writing at 0x000c37b9... (47 %)
+Writing at 0x000c8c71... (50 %)
+Writing at 0x000cdeee... (52 %)
+Writing at 0x000d3296... (54 %)
+Writing at 0x000d8412... (56 %)
+Writing at 0x000dd5ba... (58 %)
+Writing at 0x000e265b... (60 %)
+Writing at 0x000e7c19... (63 %)
+Writing at 0x000ed6c6... (65 %)
+Writing at 0x000f2cbd... (67 %)
+Writing at 0x000f81ce... (69 %)
+Writing at 0x000fd355... (71 %)
+Writing at 0x0010273d... (73 %)
+Writing at 0x001079bf... (76 %)
+Writing at 0x0010d0a6... (78 %)
+Writing at 0x001128db... (80 %)
+Writing at 0x0011871d... (82 %)
+Writing at 0x0011e150... (84 %)
+Writing at 0x001237f7... (86 %)
+Writing at 0x00129765... (89 %)
+Writing at 0x00130c76... (91 %)
+Writing at 0x00138a11... (93 %)
+Writing at 0x001400e9... (95 %)
+Writing at 0x001454d1... (97 %)
+Writing at 0x0014aa8e... (100 %)
+Wrote 1310800 bytes (752239 compressed) at 0x00010000 in 20.7 seconds (effective 505.7 kbit/s)...
+Hash of data verified.
+
+Leaving...
+Hard resetting via RTS pin...
+============================================================================== [SUCCESS] Took 158.18 seconds ==============================================================================
+
+Environment     Status    Duration
+--------------  --------  ------------
+ttgo-lora32-v1  SUCCESS   00:02:38.176
+=============================================================================== 1 succeeded in 00:02:38.176 ===============================================================================
+ *  Terminal will be reused by tasks, press any key to close it. 

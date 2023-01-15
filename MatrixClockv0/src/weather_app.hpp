@@ -7,7 +7,7 @@
 #include <NTPClient.h>           //https://github.com/taranais/NTPClient
 #include "WiFiManager.h"
 #include "Orbitron_Medium_20.h"
-#include <WiFi.h>
+//#include <WiFi.h>
 #include <WiFiUdp.h>
 #include <HTTPClient.h>
 
@@ -85,7 +85,6 @@ public:
   byte b=1;
 
   int weather_set(void) {
-    Serial.println("Entrein na weather_setup");
       pinMode(0,INPUT_PULLUP);
       pinMode(35,INPUT);
       tft.init();
@@ -171,11 +170,9 @@ public:
   String curSeconds="";
 
   int weather_routine() {
-    Serial.println("Entrei na wheather_routine()");
     tft.pushImage(0, 88,  135, 65, ani1[frame]);
     frame++;
-    if(frame>=10)
-    frame=0;
+    if(frame>=10) frame=0;
 
     if(digitalRead(35)==0){
     if(press2==0)
@@ -224,7 +221,7 @@ public:
     // 2018-05-28T16:00:13Z
     // We need to extract date and time
     formattedDate = timeClient.getFormattedDate();
-    Serial.println(formattedDate);
+    //Serial.println(formattedDate);
 
   
     int splitT = formattedDate.indexOf("T");
@@ -251,7 +248,7 @@ public:
             tt=timeStamp.substring(0,5);
           }
     
-    delay(80);
+    //delay(80);
     return 1;
   }
 

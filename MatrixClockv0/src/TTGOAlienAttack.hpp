@@ -191,10 +191,10 @@ void restart()
       tft.fillScreen(TFT_BLACK);
       tft.setTextColor(TFT_WHITE,TFT_BLACK);
       tft.pushImage(0,0,135,240,back);
-      while(digitalRead(0)==1)
+      if(digitalRead(0)==1)
           {
           tft.pushImage(34,0,102,84,ani[aniFrame]);
-          delay(40);
+          //delay(40);
           aniFrame++;
           if(aniFrame==25)
             aniFrame=0; 
@@ -281,15 +281,14 @@ void restart()
         tft.pushImage(0,0,135,240,gameover);
         tft.drawString("SCORE: "+String(score),25,120,2);
         tft.drawString("TIME: "+String(timeAlive),25,140,2);
-        delay(500);
-        while(digitalRead(0)==1);
-        restart();
-        fase=0;
-        
+        //delay(500);
+        if(digitalRead(0)==0) 
+        {
+          restart();
+          fase=0;
+        }
       }
-  
   }
-
 };
 
 // void setup()

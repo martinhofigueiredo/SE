@@ -23,13 +23,8 @@ class loraGame{
 
   int game_set(void) 
   {
-      Serial.println("Entrei na game_setup() lora");
       pinMode(0,INPUT);
       pinMode(35,INPUT);
-      tft.init();
-      tft.setRotation(0);
-      tft.setSwapBytes(true);
-      tft.pushImage(0, 0,  135, 240, bootlogo);
       return 1;
   }
 
@@ -39,38 +34,44 @@ class loraGame{
   int gameSpeed=7000;
 
   int game_routine() {
-    Serial.println("Entrein na game_routine() lora");
+    if (fase == -1)
+    {
+      tft.init();
+      tft.setRotation(0);
+      tft.fillScreen(TFT_BLACK);
+      tft.setSwapBytes(true);
+      tft.pushImage(0, 0,  135, 240, bootlogo);
+      fase++;
+    }
     if(fase==0)
     {
-      
       if(digitalRead(0)==0 || digitalRead(35)==0)
       {
         if(pom==0){
-        tft.fillScreen(TFT_BLACK);
-    tft.drawLine(0,17,0,240,TFT_GREY);
-    tft.drawLine(0,17,135,17,TFT_GREY);
-    tft.drawLine(134,17,134,240,TFT_GREY);
+          tft.fillScreen(TFT_BLACK);
+          tft.drawLine(0,17,0,240,TFT_GREY);
+          tft.drawLine(0,17,135,17,TFT_GREY);
+          tft.drawLine(134,17,134,240,TFT_GREY);
 
-    tft.setCursor(3, 3, 2);
-    
-    tft.setTextColor(TFT_WHITE,TFT_BLACK);  tft.setTextSize(1);
+          tft.setCursor(3, 3, 2);
+          
+          tft.setTextColor(TFT_WHITE,TFT_BLACK);  tft.setTextSize(1);
 
           tft.setCursor(0, 0, 2);
           tft.println("SCORE "+String(score));
 
-      tft.setCursor(99, 0, 2);
-      tft.println("LVL"+String(level));
-      fase=fase+1;
-      pom=1;
+          tft.setCursor(99, 0, 2);
+          tft.println("LVL"+String(level));
+          fase=fase+1;
+          pom=1;
         }
         
         }else {pom=0;}
       }
 
       if(fase==1){
-
-              if(y!=ny){ 
-              tft.fillEllipse(nx, ny, 2, 2, TFT_BLACK);   //brisanje loptice
+      if(y!=ny){ 
+          tft.fillEllipse(nx, ny, 2, 2, TFT_BLACK);   //brisanje loptice
           ny=y;
           nx=x;
       }
@@ -81,20 +82,17 @@ class loraGame{
       // spe=spe+1;
 
     if(px>=2 && px<=109){
-    if(digitalRead(0)==0)
-    px=px-1;
-    if(digitalRead(35)==0)
-    px=px+1;
-    }
-    if(px<=3)
-    px=4;
+        if(digitalRead(0)==0)
+        px=px-1;
+        if(digitalRead(35)==0)
+        px=px+1;
+      }
+    if(px<=3) px=4;
 
-      if(px>=108)
-    px=107;
+    if(px>=108) px=107;
     
     if(y>232 && x>px && x<px+24){ ///brisati kasnije
     ys=ys*-1;
-    
     xs=amount[random(4)]*vrije[random(2)];
 
     }
@@ -116,11 +114,9 @@ class loraGame{
           }
         }
 
-      if(y<21)
-    ys=ys*-1.00;
+      if(y<21) ys=ys*-1.00;
 
-      if(y>240)
-    fase=fase+1;
+      if(y>240) fase=fase+1;
 
     if(x>=130)
     xs=xs*-1.00;
@@ -166,7 +162,8 @@ class loraGame{
     tft.setCursor(13, 123, 4);
     tft.println("SCORE:"+String(score));
     
-    delay(3000);
+    if(digitalRead(0)==0 || digitalRead(35)==0) fase = -1;
+    //delay(3000);
     }
     return 1;
   }
