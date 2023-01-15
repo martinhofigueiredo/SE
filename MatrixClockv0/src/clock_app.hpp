@@ -6,14 +6,9 @@
 
 // Based on a sketch by DavyLandman:
 // https://github.com/Bodmer/TFT_eSPI/issues/905
-
-#include "WiFiManager.h"
-
-#include <Arduino.h>
-// #include <TFT_eSPI.h> // Master copy here: https://github.com/Bodmer/TFT_eSPI
-// #include <SPI.h>
 #include "common.hpp"
 #include "NotoSansBold15.h"
+
 
 //TFT_eSPI tft = TFT_eSPI();  // Invoke library, pins defined in User_Setup.h
 
@@ -63,11 +58,10 @@ void getCoord(int16_t x, int16_t y, float *xp, float *yp, int16_t r, float a)
   *xp =  sx1 * r + x;
   *yp =  sy1 * r + y;
 }
-
+TFT_eSprite face = TFT_eSprite(&tft);
 class clockApp{
   
 public:
-  static TFT_eSprite clockApp::face = TFT_eSprite(&tft);
   // Time for next tick
   uint32_t targetTime = 0;
 

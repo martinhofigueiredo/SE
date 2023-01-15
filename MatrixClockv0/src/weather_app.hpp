@@ -1,7 +1,4 @@
 #include "ani_1.h"
-// #include <SPI.h>
-// #include <TFT_eSPI.h> // Hardware-specific library
-//TFT_eSPI tft = TFT_eSPI();       // Invoke custom library
 #include "common.hpp"
 #include <ArduinoJson.h>          //https://github.com/bblanchon/ArduinoJson.git
 #include <NTPClient.h>           //https://github.com/taranais/NTPClient

@@ -1,14 +1,10 @@
 #include <Arduino.h>
-//#include "TTGOAlienAttack.hpp"
-#include "igraLORA.hpp"
+#include "clock_app.hpp"
 #include "weather_app.hpp"
-//#include "clock_app.hpp"
-// #include <freertos/FreeRTOS.h>
-// #include <freertos/task.h>
 
-//AlienAttack alien;
+
 weatherApp weather;
-loraGame lora;
+clockApp clock_app;
 
 int counter = 0;
 int setup_executed = 1;
@@ -48,8 +44,8 @@ void setup()
 int loop_count=0;
 long int time_loop=0;
 long int init_time;
-long int total_time_weather = 0, total_time_lora = 0;
-double avg_time_task_wheather, avg_time_task_lora;
+long int total_time_weather = 0, total_time_clock = 0;
+double avg_time_task_wheather, avg_time_task_clock;
 void loop()
 {
   init_time = micros();
@@ -62,19 +58,15 @@ void loop()
       delay(500);
     } 
     if(counter == 1){
-      //Serial.println("GET INTO SWITCH CASE 1 lora game");
-      if(setup_executed == 0) {weather.weather_set(); setup_executed = 1; loop_count = 1; total_time_weather = 0;}
+      //Serial.println("GET INTO SWITCH CASE 1 clock game");
+      if(setup_executed == 0) {weather.weather_set(); setup_executed = 1; loop_count = 0;}
       if(setup_executed == 1) weather.weather_routine(); 
-      total_time_weather +=  time_loop;
-      avg_time_task_wheather = total_time_weather / loop_count;
       loop_count++;
     } else if (counter == 2)
     {
       //Serial.println("GET INTO SWITCH CASE 2 wheather app");
-      if(setup_executed == 0) {lora.game_set(); setup_executed = 1; loop_count = 1; total_time_lora = 0;}
-      if(setup_executed == 1) lora.game_routine();
-      total_time_lora +=  time_loop;
-      avg_time_task_lora = total_time_lora / loop_count;
+      if(setup_executed == 0) {clock_app.clock_setup(); setup_executed = 1; loop_count = 0;}
+      if(setup_executed == 1) clock_app.clock_routine();
       loop_count++;
     } else
     {
@@ -89,13 +81,11 @@ void loop()
       Serial.print(time_loop);
       if(counter == 1) 
       {
-        Serial.print(" Average_wheather_task_time: ");
-        Serial.print(avg_time_task_wheather);
+        Serial.print(" of wheather_task_time");
   
       }else if(counter == 2)
       {
-        Serial.print(" Average_smartclock_task_time");
-        Serial.print(avg_time_task_lora);
+        Serial.print(" of smartclock_task_time");
       }
       Serial.println();
     }
