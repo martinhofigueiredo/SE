@@ -22,28 +22,52 @@ documentclass_options:
 ...
 
 # Introduction
- The system we developed is intend to be used as a small digital clock with a few minigames. This serves as an example of a IoT device capable of displaying some up to date information like the weather.
+ The system we developed is intend to be used as a small digital clock with a few minigames. This serves as an example of a IoT device capable of displaying some up to date information like the weather and having some interative features that need a realtime response as for the minigames.
 
-
-![This is gonna be the caption.](pic/bounceball.jpg){#fig:dummy }
-<!---
-Comments look like this and do not show up in the PDF
-
-
-References are cited as @mittner2014brain or [@mittner2014brain].
--->
 
 # Methods
 
-We tried to structure the code for the functions we wanted to develop in a "apps" a  class object that has a `setup` method that handles all the configuration of the microcontroller and a `routine` method that is the iterated on to update the app.
+We tried to structure the code for the functions we wanted to develop in a "apps" a  class object that has a `setup` method that handles all the configuration of the microcontroller and a `routine` method that has to be iterated on to update the app.
 
-These were then placed on freeRTOS task scheduler which was controlled firstly in a round-robin to make sure every task was sucesseful run at least once so we could time it
+The timing of each function was done using the `micro()` to timestamp the begin and end of the function and the value presented here was calculated as the last result of a rolling average after 10000 cycles.
 
-To get the timing results of each task we used the freeRTOS timing API to return the value of 
+The memory usage of our programs takes into account the assets needed to run the applications and the binary that compiled and uploaded  
 
-Footnotes can be entered using this code[^1].
+# Apps
 
-[^1]: a footnote
+# Clock and Weather
+
+![Weather Screen](pic/weather.jpg)
+ 
+- This app 
+
+# Games
+
+## Alien Attack
+- This game uses two buttons to move a spaceship side ways on the screen in order to hit enemys.
+![Alien Attack Load Screen](pic/alienattack.jpg)
+![Alien Attack Game Screen](pic/alienattack_play.jpg)
+
+## Bounce Ball
+- This game uses two buttons to move platform side ways on the screen in order to catch and return the ball to break the block on the top of the screen.
+![Bounce Ball Load Screen](pic/bounceball.jpg)
+![Bounce Ball Game Screen](pic/bounceball_play.jpg)
+
+
+## Results
+
+| App             | Flash (MAX 1310720 bytes) | RAM (MAX 327680 bytes) | Run Time (Avg) |
+|:---------------:|:-------------------------:|:----------------------:|:--------------:|
+| Clock & Weather | 1274853 bytes (97.3%)     | 43488 bytes (13.3%)    |                |
+| Alien Attack    |                           |                        |                |
+| Bounce Ball     |                           |                        |                |
+|                 |                           |                        |                |
+|                 |                           |                        |                |
+
+
+
+Footnotes can be entered using this code.
+
 
 Figures are included like this.
 
