@@ -187,7 +187,7 @@ void restart()
 
   if(fase==0)
       {
-      delay(500);
+      //delay(500);
       tft.fillScreen(TFT_BLACK);
       tft.setTextColor(TFT_WHITE,TFT_BLACK);
       tft.pushImage(0,0,135,240,back);
@@ -196,19 +196,20 @@ void restart()
           tft.pushImage(34,0,102,84,ani[aniFrame]);
           //delay(40);
           aniFrame++;
-          if(aniFrame==25)
-            aniFrame=0; 
+          if(aniFrame==25) aniFrame=0; 
+          }else 
+          {
+            tft.fillScreen(TFT_BLACK);
+            tft.setTextColor(TFT_WHITE,0x7820);
+            tft.fillRect(0,0,135,17,0x7820);
+            tft.drawString("SCORE:",2,1,2);
+            tft.drawString("TIME:",70,1,2);
+            tft.drawLine(0,17,135,17,0x6577);
+            tft.drawLine(0,18,0,240,0x6577);
+            tft.drawLine(134,18,134,240,0x6577);
+            fase=1; 
           }
-      tft.fillScreen(TFT_BLACK);
-      tft.setTextColor(TFT_WHITE,0x7820);
-      tft.fillRect(0,0,135,17,0x7820);
-      tft.drawString("SCORE:",2,1,2);
-      tft.drawString("TIME:",70,1,2);
-        tft.drawLine(0,17,135,17,0x6577);
-        tft.drawLine(0,18,0,240,0x6577);
-        tft.drawLine(134,18,134,240,0x6577);
-      
-      fase=1; 
+
       }
 
     if(fase==1){
@@ -286,6 +287,7 @@ void restart()
         {
           restart();
           fase=0;
+          delay(50);
         }
       }
   }

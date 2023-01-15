@@ -19,13 +19,30 @@ class loraGame{
   int level=1;
   float amount[4]={0.25,0.50,0.75,1};
   float xs=amount[random(4)]*vrije[random(2)];
-  int fase=0;
+  int fase=-1;
 
   int game_set(void) 
   {
       pinMode(0,INPUT);
       pinMode(35,INPUT);
       return 1;
+  }
+  int restart()
+  {
+    ys=1;
+    x=random(30,100); //coordinates of ball
+    y=70;
+    ny=y;  //coordinates of previous position
+    nx=x;
+    px=45; //67 je sredina    pozicija igrača
+    pxn=px;
+    score=0;
+    level=1;
+    fase=-1;
+    xstep=1;
+    spe=0;
+    pom=0;
+    return 1;
   }
 
   float xstep=1;
@@ -41,7 +58,7 @@ class loraGame{
       tft.fillScreen(TFT_BLACK);
       tft.setSwapBytes(true);
       tft.pushImage(0, 0,  135, 240, bootlogo);
-      fase++;
+      fase = 0;
     }
     if(fase==0)
     {
@@ -68,7 +85,6 @@ class loraGame{
         
         }else {pom=0;}
       }
-
       if(fase==1){
       if(y!=ny){ 
           tft.fillEllipse(nx, ny, 2, 2, TFT_BLACK);   //brisanje loptice
@@ -162,8 +178,12 @@ class loraGame{
     tft.setCursor(13, 123, 4);
     tft.println("SCORE:"+String(score));
     
-    if(digitalRead(0)==0 || digitalRead(35)==0) fase = -1;
-    //delay(3000);
+    if(digitalRead(0)==0) 
+    {
+      fase = -1;
+      restart();
+      delay(300);
+    }
     }
     return 1;
   }
