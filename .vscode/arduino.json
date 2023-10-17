@@ -1,0 +1,6 @@
+{
+    "board": "arduino:avr:uno",
+    "sketch": "Tetsting\\buttons_example.ino",
+    "port": "COM5",
+    "programmer": "avrispmkii"
+}
