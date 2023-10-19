@@ -1,0 +1,10 @@
+typedef struct {
+    int period;
+    int delay;
+    void (*func) (void);
+    int exec;
+}   Sched_Task_t;
+
+#define NT 20
+Sched_Task_t Tasks[NT];
+int cur_task = NT;
