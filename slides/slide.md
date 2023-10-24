@@ -116,23 +116,91 @@ In order to put the results into context, 2 calibration tests are run to make su
 
 - Optimistic worst case scenario, but gives us a lower boundary for the period between interrupts. 
 ---
-## Semaphore/mutex Behavior
-
-### Priority Inversion
+## Semaphore acquire-release timings in the contention case
+![bg right width:400 px height:600px](contention.svg)
+- The “creating” thread which creates a semaphore with `count` zero
+- Then it starts to create threads with different priorities higher than itself.
 ---
+## Semaphore acquire-release timings in the contention case
+![bg right width:400 px height:600px](contention.svg)
+- When a thread is created, it starts execution immediately and tries to acquire the semaphore
+    - But as the semaphore `count` is zero, the thread blocks and the kernel switches back to the creating thread.
+---
+## Semaphore acquire-release timings in the contention case
+![bg right width:400 px height:600px](contention.svg)
+- The time from the acquisition attempt (which fails) to the moment the creating thread is activated again is called here the “acquisition time”.
+- This time includes the thread switch time.
+
+---
+
 # Research Findings
 
 Our experimental measurements provided valuable insights. We discovered specific limitations in Android's real-time capabilities, especially concerning thread and interrupt handling. These limitations are critical for applications where meeting deadlines is paramount.
 
 ---
+## Thread Switch Latency
+
+
+|Test|Avg|Max|Min|
+|-|-|-|-|
+|Thread switch latency between 2 threads|7.9|317|7.6
+|Thread switch latency between 10 threads|8.4|321|7.9|
+|Thread switch latency between 128 threads|13.2|363|9.5|
+|Thread switch latency between 1000 threads|14.3|62.8|12.8|
+
+
+---
+## Interrupt Latency
+
+|Test|Avg|Max|Min|
+|---|---|---|---|
+|Interrupt dispatch latency|1.9 µs|30.9 µs|1.8 µs|
+
+---
+## Sustained Interrupt Frequency
+
+|Interrupt period|# interrupts generated|# interrupts lost|
+|----|----|----|
+100 µs|10 000|23|
+120 µs|10 000|17|
+150 µs|10 000|2|
+180 µs|10 000|0|
+310 µs|10 000 000|3|
+330 µs|10 000 000|2|
+
+---
+## Sustained Interrupt Frequency
+
+|Interrupt period|# interrupts generated|# interrupts lost|
+|----|----|----|
+350 µs|100 000|0|
+350 µs|1 000 000|4|
+370 µs|1 000 000|0|
+370 µs|10 000 000|6|
+390 µs|10 000 000|3|
+410 µs|10 000 000|0|
+
+---
+
+## Semaphore acquire-release timings in the contention case
+![](contention.png)
+
+---
+
+## Mutex Locking behavior
+
+![](mutexnogood.png)
+![](mutexgood.png)
+
+---
 # Challenges and Limitations
 
-During our research, we encountered several challenges, both technical and methodological. Additionally, Android's limitations in real-time applications, particularly in the Bionic C library, became apparent. These constraints impact Android's ability to function effectively in real-time environments.
+During our research, we encountered several challenges, both technical and methodological. Additionally, Android's limitations in real-time applications, particularly in the `Bionic` C library, became apparent. These constraints impact Android's ability to function effectively in real-time environments.
 
 ---
 # Possible Solutions
 
-While we identified challenges, we also explored potential solutions. Enhancements in the `Bionic` C library and other Android components could significantly improve its real-time capabilities. We encourage discussions and brainstorming for more innovative solutions.
+While we identified challenges, we also explored potential solutions. Enhancements in the `Bionic` C library and other Android components could significantly improve its real-time capabilities. 
 
 ---
 # Conclusion
@@ -142,4 +210,4 @@ In conclusion, our research indicates that while Android is a powerful and adapt
 ---
 # Q&A
 
-Thank you for your attention. I now invite questions from the audience. Please feel free to ask any queries or share your thoughts on this topic
+Thank you for your attention. We now invite questions from the audience. Please feel free to ask any questions or share your thoughts on this topic
