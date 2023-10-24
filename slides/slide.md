@@ -132,7 +132,7 @@ During our research, we encountered several challenges, both technical and metho
 ---
 # Possible Solutions
 
-While we identified challenges, we also explored potential solutions. Enhancements in the Bionic C library and other Android components could significantly improve its real-time capabilities. We encourage discussions and brainstorming for more innovative solutions.
+While we identified challenges, we also explored potential solutions. Enhancements in the `Bionic` C library and other Android components could significantly improve its real-time capabilities. We encourage discussions and brainstorming for more innovative solutions.
 
 ---
 # Conclusion
