@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "author": "Anonymous maker",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "wokwi-arduino-uno", "id": "uno", "top": -37.8, "left": 9, "attrs": {} },
+    { "type": "wokwi-ir-receiver", "id": "ir1", "top": -78.15, "left": -126.58, "attrs": {} },
+    { "type": "wokwi-ir-remote", "id": "remote1", "top": 345.6, "left": -220.8, "attrs": {} },
+    { "type": "wokwi-relay-module", "id": "relay1", "top": 326.6, "left": 412.8, "attrs": {} },
+    { "type": "wokwi-relay-module", "id": "relay2", "top": 403.4, "left": 412.8, "attrs": {} }
+  ],
+  "connections": [
+    [ "uno:5V", "relay1:VCC", "red", [ "v0" ] ],
+    [ "uno:5V", "relay2:VCC", "red", [ "v0" ] ],
+    [ "uno:GND.2", "relay1:GND", "black", [ "v0" ] ],
+    [ "uno:GND.2", "relay2:GND", "black", [ "v0" ] ],
+    [ "uno:GND.2", "ir1:GND", "black", [ "v57.5", "h-284.1" ] ],
+    [ "uno:6", "relay1:IN", "green", [ "v-76.8", "h166.9", "v470.4" ] ],
+    [ "uno:7", "relay2:IN", "green", [ "v-67.2", "h166.8", "v537.6" ] ],
+    [ "uno:5V", "ir1:VCC", "red", [ "v76.7", "h-255.4" ] ],
+    [ "uno:11", "ir1:DAT", "green", [ "v-28.8", "h-172.2", "v96", "h-67.2" ] ]
+  ],
+  "dependencies": {}
+}
