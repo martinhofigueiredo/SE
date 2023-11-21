@@ -5,3 +5,4 @@ vscode:
     - Wokwi.wokwi-vscode
 image:
     file: .gitpod.Dockerfile
+workspaceLocation: 'Project'
