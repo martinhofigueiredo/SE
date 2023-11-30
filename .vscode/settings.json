@@ -1,12 +1,9 @@
 {
-    "C_Cpp.default.compilerPath": "C:\\cygwin64\\bin\\gcc.exe",
-    "idf.espIdfPath": "/home/gitpod/esp/esp-idf",
-    "idf.pythonBinPath": "/home/gitpod/.espressif/python_env/idf5.1_py3.12_env/bin/python",
-    "idf.toolsPath": "/home/gitpod/.espressif",
-    "idf.customExtraPaths": "/home/gitpod/.espressif/tools/xtensa-esp-elf-gdb/12.1_20221002/xtensa-esp-elf-gdb/bin:/home/gitpod/.espressif/tools/riscv32-esp-elf-gdb/12.1_20221002/riscv32-esp-elf-gdb/bin:/home/gitpod/.espressif/tools/xtensa-esp32-elf/esp-12.2.0_20230208/xtensa-esp32-elf/bin:/home/gitpod/.espressif/tools/xtensa-esp32s2-elf/esp-12.2.0_20230208/xtensa-esp32s2-elf/bin:/home/gitpod/.espressif/tools/xtensa-esp32s3-elf/esp-12.2.0_20230208/xtensa-esp32s3-elf/bin:/home/gitpod/.espressif/tools/riscv32-esp-elf/esp-12.2.0_20230208/riscv32-esp-elf/bin:/home/gitpod/.espressif/tools/esp32ulp-elf/2.35_20220830/esp32ulp-elf/bin:/home/gitpod/.espressif/tools/openocd-esp32/v0.12.0-esp32-20230419/openocd-esp32/bin:/home/gitpod/.espressif/tools/esp-rom-elfs/20230320",
-    "idf.customExtraVars": {
-        "OPENOCD_SCRIPTS": "/home/gitpod/.espressif/tools/openocd-esp32/v0.12.0-esp32-20230419/openocd-esp32/share/openocd/scripts",
-        "ESP_ROM_ELF_DIR": "/home/gitpod/.espressif/tools/esp-rom-elfs/20230320/"
-    },
-    "idf.gitPath": "git"
+    "idf.adapterTargetName": "esp32s3",
+    "idf.openOcdConfigs": [
+        "interface/ftdi/esp32_devkitj_v1.cfg",
+        "target/esp32s3.cfg"
+    ],
+    "idf.portWin": "COM6",
+    "idf.flashType": "UART"
 }
