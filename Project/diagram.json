@@ -1,7 +1,73 @@
 {
-    "version": 1,
-    "author": "Uri Shaked",
-    "editor": "wokwi",
-    "parts": [],
-    "connections": []
-  }
+  "version": 1,
+  "author": "Mariana Dias",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "wokwi-breadboard-half", "id": "bb1", "top": 83.4, "left": -93.2, "attrs": {} },
+    { "type": "board-esp32-s3-devkitc-1", "id": "esp", "top": -57.6, "left": -254.36, "attrs": {"fullBoot":"1"} },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "btn1",
+      "top": 162.6,
+      "left": -64.2,
+      "rotate": 90,
+      "attrs": { "color": "red" }
+    },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "btn2",
+      "top": 162.6,
+      "left": 127.8,
+      "rotate": 90,
+      "attrs": { "color": "blue" }
+    },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "btn3",
+      "top": 162.6,
+      "left": 31.8,
+      "rotate": 90,
+      "attrs": { "color": "green" }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led1",
+      "top": 111.6,
+      "left": 99.8,
+      "attrs": { "color": "green" }
+    },
+    { "type": "wokwi-led", "id": "led2", "top": 111.6, "left": 3.8, "attrs": { "color": "red" } }
+  ],
+  "connections": [
+    [ "esp:TX", "$serialMonitor:RX", "", [] ],
+    [ "esp:RX", "$serialMonitor:TX", "", [] ],
+    [ "esp:GND.2", "bb1:tn.1", "black", [ "h57.6", "v134.5" ] ],
+    [ "bb1:11t.d", "esp:0", "green", [ "h-163.2", "v-67.2" ] ],
+    [ "bb1:20t.d", "bb1:tn.16", "black", [ "h-9.6", "v-57.5" ] ],
+    [ "bb1:21t.d", "esp:15", "green", [ "v0" ] ],
+    [ "bb1:tn.8", "bb1:10t.d", "black", [ "v0" ] ],
+    [ "esp:2", "bb1:4t.b", "green", [ "h0" ] ],
+    [ "bb1:tn.5", "bb1:6b.i", "black", [ "v0" ] ],
+    [ "btn3:1.l", "bb1:16t.c", "", [ "$bb" ] ],
+    [ "btn3:2.l", "bb1:14t.c", "", [ "$bb" ] ],
+    [ "btn3:1.r", "bb1:16b.h", "", [ "$bb" ] ],
+    [ "btn3:2.r", "bb1:14b.h", "", [ "$bb" ] ],
+    [ "bb1:tn.13", "bb1:16b.i", "black", [ "v0" ] ],
+    [ "esp:4", "bb1:14t.b", "green", [ "h0" ] ],
+    [ "led2:A", "bb1:11t.c", "", [ "$bb" ] ],
+    [ "led2:C", "bb1:10t.c", "", [ "$bb" ] ],
+    [ "led1:A", "bb1:21t.c", "", [ "$bb" ] ],
+    [ "led1:C", "bb1:20t.c", "", [ "$bb" ] ],
+    [ "bb1:24t.b", "esp:16", "green", [ "v0" ] ],
+    [ "bb1:26b.i", "bb1:tn.22", "black", [ "v-124.8", "h9.6" ] ],
+    [ "btn2:1.l", "bb1:26t.c", "", [ "$bb" ] ],
+    [ "btn2:2.l", "bb1:24t.c", "", [ "$bb" ] ],
+    [ "btn2:1.r", "bb1:26b.h", "", [ "$bb" ] ],
+    [ "btn2:2.r", "bb1:24b.h", "", [ "$bb" ] ],
+    [ "btn1:1.l", "bb1:6t.c", "", [ "$bb" ] ],
+    [ "btn1:2.l", "bb1:4t.c", "", [ "$bb" ] ],
+    [ "btn1:1.r", "bb1:6b.h", "", [ "$bb" ] ],
+    [ "btn1:2.r", "bb1:4b.h", "", [ "$bb" ] ]
+  ],
+  "dependencies": {}
+}
