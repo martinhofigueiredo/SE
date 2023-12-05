@@ -16,12 +16,12 @@
 #include "esp_log.h"
 
 void myTask() {
-    ESP_LOGI("APP", "calou");    
+    ESP_LOGI("APP", "Hello ");    
 }
 
 extern void app_main(void)
 {
-    ESP_LOGI("MAIN", "calou1");    
+    ESP_LOGI("MAIN", "Bacalhau");    
     xTaskCreate(myTask, "Tarefa1", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
     vTaskStartScheduler();
 
