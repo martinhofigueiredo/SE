@@ -1,12 +1,3 @@
-/* Simple HTTP + SSL Server Example
-
-   This example code is in the Public Domain (or CC0 licensed, at your option.)
-
-   Unless required by applicable law or agreed to in writing, this
-   software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
-   CONDITIONS OF ANY KIND, either express or implied.
-*/
-
 #include <stdio.h>
 #include <esp_wifi.h>
 #include <esp_event.h>
@@ -21,6 +12,40 @@
 #include <esp_https_server.h>
 #include "esp_tls.h"
 #include "sdkconfig.h"
+
+#include "include/website.h"
+
+/* Route handler for button 1 */
+static esp_err_t button1_handler(httpd_req_t *req)
+{
+    ESP_LOGI("BUTTONS", "Button 1 pressed\n");
+    return ESP_OK;
+}
+
+/* Route handler for button 2 */
+static esp_err_t button2_handler(httpd_req_t *req)
+{
+    ESP_LOGI("BUTTONS", "Button 2 pressed\n");
+    return ESP_OK;
+}
+
+static esp_err_t slider_handler(httpd_req_t *req)
+{
+    char*  buf;
+    size_t buf_len;
+
+    buf_len = httpd_req_get_url_query_len(req) + 1;
+    buf = malloc(buf_len);
+    if (httpd_req_get_url_query_str(req, buf, buf_len) == ESP_OK) {
+        char param[32];
+        if (httpd_query_key_value(buf, "value", param, sizeof(param)) == ESP_OK) {
+            ESP_LOGI("Slider", "Found URL query parameter => value=%s", param);
+        }
+    }
+    free(buf);
+    return ESP_OK;
+}
+
 
 static esp_err_t hello_get_handler(httpd_req_t *req)
 {
@@ -39,31 +64,7 @@ static esp_err_t hello_get_handler(httpd_req_t *req)
         free(buf);
     }
 
-    /* Open the HTML file */
-    FILE *file = fopen("pag.html", "r");
-    if (file == NULL) {
-        ESP_LOGE("APP", "Failed to open file");
-        return ESP_FAIL;
-    }
-
-    /* Get the size of the file */
-    fseek(file, 0, SEEK_END);
-    long fsize = ftell(file);
-    fseek(file, 0, SEEK_SET);
-
-    /* Read the content of the file into a buffer */
-    char *html_content = malloc(fsize + 1);
-    fread(html_content, 1, fsize, file);
-    fclose(file);
-
-    /* Null terminate the buffer */
-    html_content[fsize] = 0;
-
-    /* Send the HTML content as a response */
-    httpd_resp_send(req, html_content, strlen(html_content));
-
-    /* Free the buffer */
-    free(html_content);
+    httpd_resp_send(req, webpage, strlen(webpage));
 
     return ESP_OK;
 }
@@ -98,6 +99,30 @@ void app_main(void)
 
     httpd_handle_t server = NULL;
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
+    config.uri_match_fn = httpd_uri_match_wildcard;
+
+    
+    httpd_uri_t button1 = {
+        .uri       = "/button1",
+        .method    = HTTP_GET,
+        .handler   = button1_handler,
+        .user_ctx  = NULL
+    };
+
+    httpd_uri_t button2 = {
+        .uri       = "/button2",
+        .method    = HTTP_GET,
+        .handler   = button2_handler,
+        .user_ctx  = NULL
+    };
+
+    
+    httpd_uri_t slider = {
+        .uri       = "/slider",
+        .method    = HTTP_GET,
+        .handler   = slider_handler,
+        .user_ctx  = NULL
+    };
 
     httpd_uri_t hello = {
         .uri       = "/hello",
@@ -107,6 +132,9 @@ void app_main(void)
     };
 
     if (httpd_start(&server, &config) == ESP_OK) {
-        httpd_register_uri_handler(server, &hello);
+        httpd_register_uri_handler(server, &hello); 
+        httpd_register_uri_handler(server, &button1);
+        httpd_register_uri_handler(server, &button2);
+        httpd_register_uri_handler(server, &slider);
     }
 }
