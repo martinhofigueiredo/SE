@@ -19,58 +19,47 @@
 #include <driver/gpio.h>
 
 #define BUTTON1_PIN GPIO_NUM_2
-#define BUTTON2_PIN GPIO_NUM_4
+#define BUTTON2_PIN GPIO_NUM_41
 #define BUTTON3_PIN GPIO_NUM_5
 
-// Função da tarefa que lê o estado do botão
-void tarefaLeituraBotoes() {
-  gpio_config_t configButton1 = {
-      .pin_bit_mask = (1ULL << BUTTON1_PIN),
-      .mode = GPIO_MODE_INPUT,
-      .intr_type = GPIO_INTR_DISABLE,
-  };
-  gpio_config_t configButton2 = {
-      .pin_bit_mask = (1ULL << BUTTON2_PIN),
-      .mode = GPIO_MODE_INPUT,
-      .intr_type = GPIO_INTR_DISABLE,
-  };
-  gpio_config_t configButton3 = {
-      .pin_bit_mask = (1ULL << BUTTON3_PIN),
-      .mode = GPIO_MODE_INPUT,
-      .intr_type = GPIO_INTR_DISABLE,
-  };
-
-  /*esp_task_wdt_config_t config = {
-    .timeout_ms = 60000,
-    .trigger_panic = true,
-    .idle_core_mask = 0, // i.e. do not watch any idle task
-  };
-  esp_err_t err = esp_task_wdt_reconfigure(&config);*/
-
-  gpio_config(&configButton1);
-  gpio_config(&configButton2);
-  gpio_config(&configButton3);
-
-  while (1) {
-    // Ler o estado do botão 1
-    bool estadoBotao1 = gpio_get_level(BUTTON1_PIN);
-    ESP_LOGI("App","Botão 1: %d\n", estadoBotao1);
-
-    // Ler o estado do botão 2
-    bool estadoBotao2 = gpio_get_level(BUTTON2_PIN);
-    ESP_LOGI("App","Botão 2: %d\n", estadoBotao2);
-
-    // Ler o estado do botão 3
-    bool estadoBotao3 = gpio_get_level(BUTTON3_PIN);
-    ESP_LOGI("App","Botão 3: %d\n", estadoBotao3);
-
-    vTaskDelay(pdMS_TO_TICKS(100)); // Adicionar um pequeno atraso
-  }
+void read_and_log_button_state(gpio_num_t button_pin, const char* button_name) {
+    bool button_state = gpio_get_level(button_pin);
+    ESP_LOGI("App", "Button %s: %d\n", button_name, button_state);
 }
 
-extern void app_main(void) {
-  // Configurar a tarefa que lê os botões
-  xTaskCreate(tarefaLeituraBotoes, "LeituraBotoes", 4096, NULL, tskIDLE_PRIORITY + 1, NULL);
-  vTaskStartScheduler();
+void tarefaLeituraBotoes(void *pvParameters) {
+    while (1) {
+        //read_and_log_button_state(BUTTON1_PIN, "1");
+        read_and_log_button_state(BUTTON2_PIN, "2");
+        //read_and_log_button_state(BUTTON3_PIN, "3");
+
+        vTaskDelay(pdMS_TO_TICKS(100)); // Add a small delay
+    }
 }
 
+void app_main(void) {
+    gpio_config_t configButton1 = {
+        .pin_bit_mask = (1ULL << BUTTON1_PIN),
+        .mode = GPIO_MODE_INPUT,
+        .intr_type = GPIO_INTR_DISABLE,
+    };
+
+    gpio_config_t configButton2 = {
+        .pin_bit_mask = (1ULL << BUTTON2_PIN),
+        .mode = GPIO_MODE_INPUT,
+        .intr_type = GPIO_INTR_DISABLE,
+    };
+
+    gpio_config_t configButton3 = {
+        .pin_bit_mask = (1ULL << BUTTON3_PIN),
+        .mode = GPIO_MODE_INPUT,
+        .intr_type = GPIO_INTR_DISABLE,
+    };
+
+    gpio_config(&configButton1);
+    gpio_config(&configButton2);
+    gpio_config(&configButton3);
+
+    // Create a task that reads the buttons
+    xTaskCreate(tarefaLeituraBotoes, "LeituraBotoes", 4096, NULL, tskIDLE_PRIORITY + 1, NULL);
+}
