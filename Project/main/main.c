@@ -14,7 +14,7 @@
 #include "esp_system.h"
 #include "esp_event.h"
 #include "esp_log.h"
-
+#include "esp_task_wdt.h"
 #include <freertos/task.h>
 #include <driver/gpio.h>
 
@@ -40,6 +40,13 @@ void tarefaLeituraBotoes() {
       .intr_type = GPIO_INTR_DISABLE,
   };
 
+  /*esp_task_wdt_config_t config = {
+    .timeout_ms = 60000,
+    .trigger_panic = true,
+    .idle_core_mask = 0, // i.e. do not watch any idle task
+  };
+  esp_err_t err = esp_task_wdt_reconfigure(&config);*/
+
   gpio_config(&configButton1);
   gpio_config(&configButton2);
   gpio_config(&configButton3);
@@ -63,7 +70,7 @@ void tarefaLeituraBotoes() {
 
 extern void app_main(void) {
   // Configurar a tarefa que lê os botões
-  xTaskCreate(tarefaLeituraBotoes, "LeituraBotoes", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL);
+  xTaskCreate(tarefaLeituraBotoes, "LeituraBotoes", 4096, NULL, tskIDLE_PRIORITY + 1, NULL);
   vTaskStartScheduler();
 }
 
