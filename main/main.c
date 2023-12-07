@@ -18,14 +18,14 @@
 /* Route handler for button 1 */
 static esp_err_t button1_handler(httpd_req_t *req)
 {
-    ESP_LOGI("BUTTONS", "Button 1 pressed\n");
+    ESP_LOGI("BUTTONS", "Button ON pressed\n");
     return ESP_OK;
 }
 
 /* Route handler for button 2 */
 static esp_err_t button2_handler(httpd_req_t *req)
 {
-    ESP_LOGI("BUTTONS", "Button 2 pressed\n");
+    ESP_LOGI("BUTTONS", "Button OFF pressed\n");
     return ESP_OK;
 }
 
@@ -36,13 +36,20 @@ static esp_err_t slider_handler(httpd_req_t *req)
 
     buf_len = httpd_req_get_url_query_len(req) + 1;
     buf = malloc(buf_len);
+    if (buf == NULL) {
+        ESP_LOGE("Slider", "Out of memory");
+        httpd_resp_send_500(req);
+        return ESP_FAIL;
+    }
+
     if (httpd_req_get_url_query_str(req, buf, buf_len) == ESP_OK) {
         char param[32];
         if (httpd_query_key_value(buf, "value", param, sizeof(param)) == ESP_OK) {
-            ESP_LOGI("Slider", "Found URL query parameter => value=%s", param);
+            ESP_LOGI("Slider", " %s%% Brightness", param);
         }
     }
     free(buf);
+    httpd_resp_sendstr(req, "OK");
     return ESP_OK;
 }
 
