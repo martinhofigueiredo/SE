@@ -29,6 +29,42 @@ static esp_err_t button2_handler(httpd_req_t *req)
     return ESP_OK;
 }
 
+/* Route handler for button 3 */
+void button3_task(void* arg) {
+    vTaskDelay(pdMS_TO_TICKS(2000)); // Wait for 2 seconds
+    ESP_LOGI("BUTTONS", "Button OFF pressed after 2 seconds\n");
+    vTaskDelete(NULL); // Delete this task after it's done
+}
+static esp_err_t button3_handler(httpd_req_t *req)
+{
+    xTaskCreate(button3_task, "ButtonHandlerTask", 2048, NULL, tskIDLE_PRIORITY, NULL);
+    return ESP_OK;
+}
+
+/* Route handler for button 4 */
+void button4_task(void* arg) {
+    vTaskDelay(pdMS_TO_TICKS(5000)); // Wait for 5 seconds
+    ESP_LOGI("BUTTONS", "Button OFF pressed after 5 seconds\n");
+    vTaskDelete(NULL); // Delete this task after it's done
+}
+static esp_err_t button4_handler(httpd_req_t *req)
+{
+    xTaskCreate(button4_task, "ButtonHandlerTask", 2048, NULL, tskIDLE_PRIORITY, NULL);
+    return ESP_OK;
+}
+
+/* Route handler for button 5 */
+void button5_task(void* arg) {
+    vTaskDelay(pdMS_TO_TICKS(10000)); // Wait for 10 seconds
+    ESP_LOGI("BUTTONS", "Button OFF pressed after 10 seconds\n");
+    vTaskDelete(NULL); // Delete this task after it's done
+}
+static esp_err_t button5_handler(httpd_req_t *req)
+{
+    xTaskCreate(button5_task, "ButtonHandlerTask", 2048, NULL, tskIDLE_PRIORITY, NULL);
+    return ESP_OK;
+}
+
 static esp_err_t slider_handler(httpd_req_t *req)
 {
     char*  buf;
@@ -123,6 +159,27 @@ void app_main(void)
         .user_ctx  = NULL
     };
 
+    httpd_uri_t button3 = {
+        .uri       = "/button3",
+        .method    = HTTP_GET,
+        .handler   = button3_handler,
+        .user_ctx  = NULL
+    };
+
+    httpd_uri_t button4 = {
+        .uri       = "/button4",
+        .method    = HTTP_GET,
+        .handler   = button4_handler,
+        .user_ctx  = NULL
+    };
+
+    httpd_uri_t button5 = {
+        .uri       = "/button5",
+        .method    = HTTP_GET,
+        .handler   = button5_handler,
+        .user_ctx  = NULL
+    };
+
     
     httpd_uri_t slider = {
         .uri       = "/slider",
@@ -142,6 +199,9 @@ void app_main(void)
         httpd_register_uri_handler(server, &hello); 
         httpd_register_uri_handler(server, &button1);
         httpd_register_uri_handler(server, &button2);
+        httpd_register_uri_handler(server, &button3);
+        httpd_register_uri_handler(server, &button4);
+        httpd_register_uri_handler(server, &button5);
         httpd_register_uri_handler(server, &slider);
     }
 }

@@ -52,13 +52,37 @@ const char* webpage = R"=====(
   opacity: 1;
 }
 
-        button {
+        .buttonON {
+            background-color: #04AA6D;
+            border: none;
+            color: white;
             margin: 10px;
             padding: 10px 20px;
+            text-align: center;
             font-size: 24px;
             height:100px;
             width:300px;
         }
+        .buttonOFF {
+            background-color: #f44336;
+            border: none;
+            color: white;
+            margin: 10px;
+            padding: 10px 20px;
+            text-align: center;
+            font-size: 24px;
+            height:100px;
+            width:300px;
+}
+
+        .button {
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 24px;
+            height:70px;
+            width:300px;
+        }
+
     </style>
 </head>
 <body>
@@ -76,6 +100,12 @@ const char* webpage = R"=====(
     </div>
     </div>
 
+        <div class="row">
+        <div class="column">Light Brightness</div>
+
+    </div>
+    </div>
+
     <script>
         function updateSlider(value) {
         fetch(`/slider?value=${value}`);
@@ -87,11 +117,23 @@ const char* webpage = R"=====(
     </div>
 
     <a href="/button1">
-        <button class="button button1">ON</button>
+        <button class="buttonON button1">ON</button>
     </a>
 
     <a href="/button2">
-        <button class="button button2">OFF</button>
+        <button class="buttonOFF button2">OFF</button>
+    </a>
+
+    <a href="/button3">
+        <button class="button button3">OFF 2 sec</button>
+    </a>
+
+    <a href="/button4">
+        <button class="button button4">OFF 5 sec </button>
+    </a>
+
+    <a href="/button5">
+        <button class="button button5">OFF 10 sec</button>
     </a>
 
 )=====";
