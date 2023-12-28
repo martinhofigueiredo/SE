@@ -1,1 +1,1 @@
-![img](Project/DimmerESP32/img/output.gif)
+![img](img/output.gif)
