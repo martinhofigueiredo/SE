@@ -1,0 +1,18 @@
+Updated 30K from Line to Line1.
+Annotated 4N25 as U2.
+Annotated MOC3021M as U1.
+Annotated 30KK as R4.
+Annotated R as R3.
+Annotated R as R2.
+Annotated R as R1.
+Annotated BT136-600 as Q1.
+Updated Screw_Terminal_01x03 from Load to Load1.
+Annotated GND as #PWR01.
+Updated Screw_Terminal_01x03 from GridIN to GridIN1.
+Annotated B40R as D2.
+Annotated LED as D1.
+Annotated Earth as #PWR05.
+Annotated Earth as #PWR04.
+Annotated GND as #PWR03.
+Annotated +5V as #PWR02.
+Annotation complete.
