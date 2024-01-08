@@ -1,0 +1,5 @@
+[wokwi]
+version = 1
+
+firmware = '.pio\build\m5stack-atoms3\firmware.hex'
+elf = '.pio\build\m5stack-atoms3\firmware.elf'
