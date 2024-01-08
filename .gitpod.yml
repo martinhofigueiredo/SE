@@ -1,0 +1,8 @@
+
+vscode:
+  extensions:
+    - marp-team.marp-vscode
+    - Wokwi.wokwi-vscode
+image:
+    file: .gitpod.Dockerfile
+workspaceLocation: 'Project'
