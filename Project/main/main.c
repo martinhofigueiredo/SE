@@ -15,6 +15,55 @@
 
 #include "include/website.h"
 
+//TRIAC INCLUDEs
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
+#include <driver/gpio.h>
+#include <esp_intr_alloc.h>
+
+
+#define AC_LOAD GPIO_NUM_7   // GPIO number for the TRIAC control
+#define ZERO_CROSS_GPIO GPIO_NUM_8  // GPIO number for the zero-crossing interrupt
+#define AC_FREQUENCY 60  // AC Frequency in Hertz (either 50 or 60)
+
+#if AC_FREQUENCY == 50
+    #define ZERO_CROSSING_INTERVAL 10000  // 10ms for 50Hz
+#elif AC_FREQUENCY == 60
+    #define ZERO_CROSSING_INTERVAL 8333   // 8.33ms for 60Hz
+#else
+    #error "AC_FREQUENCY must be 50 or 60"
+#endif
+
+#define DIMMING_LEVELS 128
+volatile int dimming = 128;  // Dimming level (0-128)  0 = ON, 128 = OFF
+
+// Task handle
+TaskHandle_t dimmingTaskHandle = NULL;
+
+// Zero cross interrupt handler
+static void IRAM_ATTR zero_cross_int(void* arg) {
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+    vTaskNotifyGiveFromISR(dimmingTaskHandle, &xHigherPriorityTaskWoken);
+    portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
+}
+
+// Dimming task
+void dimmingTask(void *pvParameters) {
+    while (1) {
+        // Wait for notification from ISR
+        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+
+        // Perform TRIAC control here
+        // ... (omitted for brevity)
+
+        for (int i = 5; i <= DIMMING_LEVELS; i++) {
+            dimming = i;
+            vTaskDelay(10 / portTICK_PERIOD_MS);
+        }
+    }
+}
+
+
 /* Route handler for button 1 */
 static esp_err_t button1_handler(httpd_req_t *req)
 {
@@ -204,4 +253,32 @@ void app_main(void)
         httpd_register_uri_handler(server, &button5);
         httpd_register_uri_handler(server, &slider);
     }
+
+
+    // TRIAC SETUP
+
+    // Initialize GPIO for TRIAC control
+    gpio_config_t ac_load_conf = {};
+    ac_load_conf.intr_type = GPIO_INTR_DISABLE;
+    ac_load_conf.mode = GPIO_MODE_OUTPUT;
+    ac_load_conf.pin_bit_mask = (1ULL << AC_LOAD);
+    ac_load_conf.pull_down_en = 0;
+    ac_load_conf.pull_up_en = 0;
+    gpio_config(&ac_load_conf);
+
+    // Create the dimming task
+    xTaskCreate(dimmingTask, "Dimming", 2048, NULL, 10, &dimmingTaskHandle);
+
+    // Setup zero-cross interrupt
+    gpio_config_t zero_cross_conf = {};
+    zero_cross_conf.intr_type = GPIO_INTR_POSEDGE;
+    zero_cross_conf.mode = GPIO_MODE_INPUT;
+    zero_cross_conf.pin_bit_mask = (1ULL << ZERO_CROSS_GPIO);
+    zero_cross_conf.pull_down_en = GPIO_PULLDOWN_ENABLE;
+    zero_cross_conf.pull_up_en = GPIO_PULLUP_DISABLE;
+    gpio_config(&zero_cross_conf);
+
+    gpio_install_isr_service(ESP_INTR_FLAG_IRAM);
+    gpio_isr_handler_add(ZERO_CROSS_GPIO, zero_cross_int, NULL);
+
 }
