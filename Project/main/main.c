@@ -15,59 +15,27 @@
 
 #include "include/website.h"
 
-//TRIAC INCLUDEs
-#include <freertos/FreeRTOS.h>
-#include <freertos/task.h>
-#include <driver/gpio.h>
-#include <esp_intr_alloc.h>
 
+#include "include/ac_dimmer.h"
 
-#define AC_LOAD GPIO_NUM_7   // GPIO number for the TRIAC control
-#define ZERO_CROSS_GPIO GPIO_NUM_8  // GPIO number for the zero-crossing interrupt
+#define AC_LOAD 7   // GPIO number for the TRIAC control
+//#define AC_LOAD GPIO_NUM_7   // GPIO number for the TRIAC control
+#define ZERO_CROSS 8  // GPIO number for the zero-crossing interrupt
+//#define ZERO_CROSS GPIO_NUM_8  // GPIO number for the zero-crossing interrupt
 #define AC_FREQUENCY 60  // AC Frequency in Hertz (either 50 or 60)
 
-#if AC_FREQUENCY == 50
-    #define ZERO_CROSSING_INTERVAL 10000  // 10ms for 50Hz
-#elif AC_FREQUENCY == 60
-    #define ZERO_CROSSING_INTERVAL 8333   // 8.33ms for 60Hz
-#else
-    #error "AC_FREQUENCY must be 50 or 60"
-#endif
+typedef struct {
+    bool is_on;
+    uint32_t range;
+} ControlData;
 
-#define DIMMING_LEVELS 128
-volatile int dimming = 128;  // Dimming level (0-128)  0 = ON, 128 = OFF
-
-// Task handle
-TaskHandle_t dimmingTaskHandle = NULL;
-
-// Zero cross interrupt handler
-static void IRAM_ATTR zero_cross_int(void* arg) {
-    BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-    vTaskNotifyGiveFromISR(dimmingTaskHandle, &xHigherPriorityTaskWoken);
-    portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
-}
-
-// Dimming task
-void dimmingTask(void *pvParameters) {
-    while (1) {
-        // Wait for notification from ISR
-        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
-
-        // Perform TRIAC control here
-        // ... (omitted for brevity)
-
-        for (int i = 5; i <= DIMMING_LEVELS; i++) {
-            dimming = i;
-            vTaskDelay(10 / portTICK_PERIOD_MS);
-        }
-    }
-}
-
+ControlData global_control_data;
 
 /* Route handler for button 1 */
 static esp_err_t button1_handler(httpd_req_t *req)
 {
     ESP_LOGI("BUTTONS", "Button ON pressed\n");
+    ac_dimmer_set_duty(AC_LOAD, global_control_data.range);
     return ESP_OK;
 }
 
@@ -75,6 +43,8 @@ static esp_err_t button1_handler(httpd_req_t *req)
 static esp_err_t button2_handler(httpd_req_t *req)
 {
     ESP_LOGI("BUTTONS", "Button OFF pressed\n");
+    global_control_data.range = 0;
+    ac_dimmer_set_duty(AC_LOAD, global_control_data.range);
     return ESP_OK;
 }
 
@@ -108,6 +78,7 @@ void button5_task(void* arg) {
     ESP_LOGI("BUTTONS", "Button OFF pressed after 10 seconds\n");
     vTaskDelete(NULL); // Delete this task after it's done
 }
+
 static esp_err_t button5_handler(httpd_req_t *req)
 {
     xTaskCreate(button5_task, "ButtonHandlerTask", 2048, NULL, tskIDLE_PRIORITY, NULL);
@@ -130,7 +101,8 @@ static esp_err_t slider_handler(httpd_req_t *req)
     if (httpd_req_get_url_query_str(req, buf, buf_len) == ESP_OK) {
         char param[32];
         if (httpd_query_key_value(buf, "value", param, sizeof(param)) == ESP_OK) {
-            ESP_LOGI("Slider", " %s%% Brightness", param);
+            global_control_data.range = atoi(param);
+            ESP_LOGI("Slider", " %.2f%% Brightness", (global_control_data.range/(float)255)*100);
         }
     }
     free(buf);
@@ -161,12 +133,7 @@ static esp_err_t hello_get_handler(httpd_req_t *req)
     return ESP_OK;
 }
 
-void app_main(void)
-{
-    ESP_ERROR_CHECK(nvs_flash_init());
-    ESP_ERROR_CHECK(esp_netif_init());
-    ESP_ERROR_CHECK(esp_event_loop_create_default());
-
+void wifi_setup(){
     esp_netif_create_default_wifi_ap();
 
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
@@ -228,8 +195,7 @@ void app_main(void)
         .handler   = button5_handler,
         .user_ctx  = NULL
     };
-
-    
+ 
     httpd_uri_t slider = {
         .uri       = "/slider",
         .method    = HTTP_GET,
@@ -253,32 +219,26 @@ void app_main(void)
         httpd_register_uri_handler(server, &button5);
         httpd_register_uri_handler(server, &slider);
     }
+}
 
+void dimmer_setup() {
+    ac_dimmer_init(ZERO_CROSS);
 
-    // TRIAC SETUP
+    ac_dimmer_create((ac_dimmer_config_t){
+        .pwm_gpio=AC_LOAD,
+        .type=ac_dimmer_forward_phase,
+    });
+}
 
-    // Initialize GPIO for TRIAC control
-    gpio_config_t ac_load_conf = {};
-    ac_load_conf.intr_type = GPIO_INTR_DISABLE;
-    ac_load_conf.mode = GPIO_MODE_OUTPUT;
-    ac_load_conf.pin_bit_mask = (1ULL << AC_LOAD);
-    ac_load_conf.pull_down_en = 0;
-    ac_load_conf.pull_up_en = 0;
-    gpio_config(&ac_load_conf);
-
+void app_main(void)
+{
+    global_control_data.is_on = false;
+    global_control_data.range = 0;
+    ESP_ERROR_CHECK(nvs_flash_init());
+    ESP_ERROR_CHECK(esp_netif_init());
+    ESP_ERROR_CHECK(esp_event_loop_create_default());
+    dimmer_setup();
+    wifi_setup();
     // Create the dimming task
-    xTaskCreate(dimmingTask, "Dimming", 2048, NULL, 10, &dimmingTaskHandle);
-
-    // Setup zero-cross interrupt
-    gpio_config_t zero_cross_conf = {};
-    zero_cross_conf.intr_type = GPIO_INTR_POSEDGE;
-    zero_cross_conf.mode = GPIO_MODE_INPUT;
-    zero_cross_conf.pin_bit_mask = (1ULL << ZERO_CROSS_GPIO);
-    zero_cross_conf.pull_down_en = GPIO_PULLDOWN_ENABLE;
-    zero_cross_conf.pull_up_en = GPIO_PULLUP_DISABLE;
-    gpio_config(&zero_cross_conf);
-
-    gpio_install_isr_service(ESP_INTR_FLAG_IRAM);
-    gpio_isr_handler_add(ZERO_CROSS_GPIO, zero_cross_int, NULL);
-
+    int cycle = 0;
 }
