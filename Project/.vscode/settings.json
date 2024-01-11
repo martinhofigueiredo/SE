@@ -8,6 +8,8 @@
     "idf.portWin": "COM6",
     "idf.flashType": "UART",
     "files.associations": {
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "website.h": "c",
+        "esp32-triac-dimmer-driver.h": "c"
     }
 }

@@ -9,5 +9,6 @@
     "idf.flashType": "UART",
     "files.associations": {
         "stdio.h": "c"
-    }
+    },
+    "cmake.sourceDirectory": "C:/Users/Cruz-/Desktop/SE/Github/SE/Project/CMakeLists.txt"
 }
