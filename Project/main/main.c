@@ -14,14 +14,13 @@
 #include "sdkconfig.h"
 
 #include "include/website.h"
+#include "driver/gpio.h"
+#include "esp_intr_alloc.h"
 
-
-#include "include/ac_dimmer.h"
-
-#define AC_LOAD 7   // GPIO number for the TRIAC control
-//#define AC_LOAD GPIO_NUM_7   // GPIO number for the TRIAC control
-#define ZERO_CROSS 8  // GPIO number for the zero-crossing interrupt
-//#define ZERO_CROSS GPIO_NUM_8  // GPIO number for the zero-crossing interrupt
+//#define AC_LOAD 7   // GPIO number for the TRIAC control
+#define AC_LOAD GPIO_NUM_7   // GPIO number for the TRIAC control
+//#define ZERO_CROSS 8  // GPIO number for the zero-crossing interrupt
+#define ZERO_CROSS GPIO_NUM_8  // GPIO number for the zero-crossing interrupt
 #define AC_FREQUENCY 60  // AC Frequency in Hertz (either 50 or 60)
 
 typedef struct {
@@ -31,11 +30,19 @@ typedef struct {
 
 ControlData global_control_data;
 
+static const char *TAG = "interrupt_example";
+
+static void IRAM_ATTR gpio_isr_handler(void* arg) {
+    uint32_t gpio_num = (uint32_t)arg;
+    ESP_LOGI(TAG, "GPIO interrupt occurred");
+}
+
+
 /* Route handler for button 1 */
 static esp_err_t button1_handler(httpd_req_t *req)
 {
     ESP_LOGI("BUTTONS", "Button ON pressed\n");
-    ac_dimmer_set_duty(AC_LOAD, global_control_data.range);
+    global_control_data.is_on = true;
     return ESP_OK;
 }
 
@@ -43,8 +50,7 @@ static esp_err_t button1_handler(httpd_req_t *req)
 static esp_err_t button2_handler(httpd_req_t *req)
 {
     ESP_LOGI("BUTTONS", "Button OFF pressed\n");
-    global_control_data.range = 0;
-    ac_dimmer_set_duty(AC_LOAD, global_control_data.range);
+    global_control_data.is_on = false;
     return ESP_OK;
 }
 
@@ -221,14 +227,6 @@ void wifi_setup(){
     }
 }
 
-void dimmer_setup() {
-    ac_dimmer_init(ZERO_CROSS);
-
-    ac_dimmer_create((ac_dimmer_config_t){
-        .pwm_gpio=AC_LOAD,
-        .type=ac_dimmer_forward_phase,
-    });
-}
 
 void app_main(void)
 {
@@ -237,8 +235,25 @@ void app_main(void)
     ESP_ERROR_CHECK(nvs_flash_init());
     ESP_ERROR_CHECK(esp_netif_init());
     ESP_ERROR_CHECK(esp_event_loop_create_default());
-    dimmer_setup();
+    
     wifi_setup();
     // Create the dimming task
-    int cycle = 0;
+
+    
+    // Configure the GPIO pin you want to attach the ISR to.
+    gpio_config_t gpio_conf;
+    gpio_conf.pin_bit_mask = (1ULL << 8);  // Replace with your GPIO pin number
+    gpio_conf.mode = GPIO_MODE_INPUT;
+    gpio_conf.pull_up_en = GPIO_PULLUP_DISABLE;
+    gpio_conf.pull_down_en = GPIO_PULLDOWN_ENABLE;
+    gpio_conf.intr_type = GPIO_INTR_POSEDGE; // Trigger on a falling edge
+    gpio_config(&gpio_conf);
+
+    // Install the ISR service with the handler function.
+    gpio_install_isr_service(0); // Default ESP_INTR_FLAG_LOWMED
+
+    // Hook up the ISR function to the GPIO pin.
+    gpio_isr_handler_add(8, gpio_isr_handler, (void*)8); // Replace with your GPIO pin number
+
 }
+
