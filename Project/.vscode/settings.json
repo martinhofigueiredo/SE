@@ -5,9 +5,11 @@
         "interface/ftdi/esp32_devkitj_v1.cfg",
         "target/esp32s3.cfg"
     ],
-    "idf.portWin": "COM5",
+    "idf.portWin": "COM6",
     "idf.flashType": "UART",
     "files.associations": {
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "website.h": "c",
+        "esp32-triac-dimmer-driver.h": "c"
     }
 }
