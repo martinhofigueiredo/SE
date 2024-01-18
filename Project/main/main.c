@@ -274,7 +274,7 @@ void app_main(void)
             setState(ptr_dimmer, ON);
             setPower(ptr_dimmer, global_control_data.range);
         }else{
-            setState(ptr_dcimmer, OFF);
+            setState(ptr_dimmer, OFF);
             setPower(ptr_dimmer, 0);
         }
         // wait
