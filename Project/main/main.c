@@ -20,6 +20,10 @@
 #include "include/esp32-triac-dimmer-driver.h" 
 
 
+#define TOTAL_CALL_AMOUNT 200
+#define PERFMON_TRACELEVEL -1 // -1 - will ignore trace level
+
+
 #include "perfmon.h" //performance API
 
 
