@@ -20,11 +20,6 @@
 #include "include/esp32-triac-dimmer-driver.h" 
 
 
-#define TOTAL_CALL_AMOUNT 200
-#define PERFMON_TRACELEVEL -1 // -1 - will ignore trace level
-
-
-#include "perfmon.h" //performance API
 
 
 #define AC_LOAD 7   // GPIO number for the TRIAC control
@@ -249,11 +244,12 @@ void wifi_setup(){
     }
 }
 
+dimmertyp *ptr_dimmer; 
 
 void update_light(void *pvParameters){
     while(1){
-        ESP_LOGI("RANGE", "%d", (int) global_control_data.range);
-        ESP_LOGI("IS_ON", "%d", (int) global_control_data.is_on);
+        //ESP_LOGI("RANGE", "%d", (int) global_control_data.range);
+        //ESP_LOGI("IS_ON", "%d", (int) global_control_data.is_on);
         if(global_control_data.is_on){
             setState(ptr_dimmer, ON);
             setPower(ptr_dimmer, global_control_data.range);
@@ -261,12 +257,15 @@ void update_light(void *pvParameters){
             setState(ptr_dimmer, OFF);
             setPower(ptr_dimmer, 0);
         }
-        // wait
-        //vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
 }
 
-
+void stats(void *params){
+    char  buffer[1024]; 
+    vTaskGetRunTimeStats(buffer);
+    ESP_LOGI("STATS", "%s", buffer);
+}
+   
 void app_main(void)
 {
     global_control_data.is_on = false;
@@ -274,8 +273,7 @@ void app_main(void)
     ESP_ERROR_CHECK(nvs_flash_init());
     ESP_ERROR_CHECK(esp_netif_init());
     ESP_ERROR_CHECK(esp_event_loop_create_default());
-    dimmertyp *ptr_dimmer; 
-    wifi_setup();
+     wifi_setup();
     // Create the dimming task
     ptr_dimmer = createDimmer(AC_LOAD, ZERO_CROSS);
     begin(ptr_dimmer, TOGGLE_MODE, ON, AC_FREQUENCY);
@@ -290,21 +288,8 @@ void app_main(void)
 
     gpio_config(&lcd_but);
     
-    xTaskCreate(tarefaLeituraBotoes, "LeituraBotoes", 4096, NULL, tskIDLE_PRIORITY + 1, NULL);
-    xTaskCreate(update_light, "Update Light", 4096, NULL, tskIDLE_PRIORITY + 1, NULL);
-
-    ESP_LOGI(TAG, "Start");
-    ESP_LOGI(TAG, "Start test with printing all available statistic");
-    xtensa_perfmon_config_t pm_config = {};
-    pm_config.counters_size = sizeof(xtensa_perfmon_select_mask_all) / sizeof(uint32_t) / 2;
-    pm_config.select_mask = xtensa_perfmon_select_mask_all;
-    pm_config.repeat_count = TOTAL_CALL_AMOUNT;
-    pm_config.max_deviation = 1;
-    pm_config.call_function = update_light;
-    pm_config.callback = xtensa_perfmon_view_cb;
-    pm_config.callback_params = stdout;
-    pm_config.tracelevel = PERFMON_TRACELEVEL;
-    xtensa_perfmon_exec(&pm_config);
-}
-
+    xTaskCreate(tarefaLeituraBotoes, "LeituraBotoes", 2048, NULL, tskIDLE_PRIORITY + 1, NULL);
+    xTaskCreate(update_light, "Update Light", 2048, NULL, tskIDLE_PRIORITY + 2, NULL);
+    xTaskCreate(stats, "STATS", 1024, NULL, tskIDLE_PRIORITY, NULL);
+    }
 
