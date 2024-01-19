@@ -19,6 +19,10 @@
 
 #include "include/esp32-triac-dimmer-driver.h" 
 
+
+#include "perfmon.h" //performance API
+
+
 #define AC_LOAD 7   // GPIO number for the TRIAC control
 //#define AC_LOAD GPIO_NUM_7   // GPIO number for the TRIAC control
 #define ZERO_CROSS 8  // GPIO number for the zero-crossing interrupt
@@ -242,6 +246,23 @@ void wifi_setup(){
 }
 
 
+void update_light(void *pvParameters){
+    while(1){
+        ESP_LOGI("RANGE", "%d", (int) global_control_data.range);
+        ESP_LOGI("IS_ON", "%d", (int) global_control_data.is_on);
+        if(global_control_data.is_on){
+            setState(ptr_dimmer, ON);
+            setPower(ptr_dimmer, global_control_data.range);
+        }else{
+            setState(ptr_dimmer, OFF);
+            setPower(ptr_dimmer, 0);
+        }
+        // wait
+        //vTaskDelay(1000 / portTICK_PERIOD_MS);
+    }
+}
+
+
 void app_main(void)
 {
     global_control_data.is_on = false;
@@ -266,19 +287,20 @@ void app_main(void)
     gpio_config(&lcd_but);
     
     xTaskCreate(tarefaLeituraBotoes, "LeituraBotoes", 4096, NULL, tskIDLE_PRIORITY + 1, NULL);
+    xTaskCreate(update_light, "Update Light", 4096, NULL, tskIDLE_PRIORITY + 1, NULL);
 
-    while(1){
-        ESP_LOGI("RANGE", "%d", (int) global_control_data.range);
-        ESP_LOGI("IS_ON", "%d", (int) global_control_data.is_on);
-        if(global_control_data.is_on){
-            setState(ptr_dimmer, ON);
-            setPower(ptr_dimmer, global_control_data.range);
-        }else{
-            setState(ptr_dimmer, OFF);
-            setPower(ptr_dimmer, 0);
-        }
-        // wait
-        //vTaskDelay(1000 / portTICK_PERIOD_MS);
-    }
+    ESP_LOGI(TAG, "Start");
+    ESP_LOGI(TAG, "Start test with printing all available statistic");
+    xtensa_perfmon_config_t pm_config = {};
+    pm_config.counters_size = sizeof(xtensa_perfmon_select_mask_all) / sizeof(uint32_t) / 2;
+    pm_config.select_mask = xtensa_perfmon_select_mask_all;
+    pm_config.repeat_count = TOTAL_CALL_AMOUNT;
+    pm_config.max_deviation = 1;
+    pm_config.call_function = update_light;
+    pm_config.callback = xtensa_perfmon_view_cb;
+    pm_config.callback_params = stdout;
+    pm_config.tracelevel = PERFMON_TRACELEVEL;
+    xtensa_perfmon_exec(&pm_config);
 }
+
 
