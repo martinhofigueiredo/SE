@@ -9,6 +9,17 @@
 #include "esp_eth.h"
 #include "protocol_examples_common.h"
 
+#include <string.h>
+#include <unistd.h>
+#include "esp_timer.h"
+#include "esp_log.h"
+#include "esp_sleep.h"
+#include "perfmon.h"
+
+
+
+
+
 #include <esp_https_server.h>
 #include "esp_tls.h"
 #include "sdkconfig.h"
@@ -18,6 +29,33 @@
 #include "esp_intr_alloc.h"
 
 #include "include/esp32-triac-dimmer-driver.h" 
+
+static const char* TAG = "example";
+
+static void exec_test_function(void *params)
+{
+    for (int i = 0 ; i < 100 ; i++) {
+        __asm__ __volatile__("   nop");
+    }
+}
+
+// Table with dedicated performance counters
+static uint32_t pm_check_table[] = {
+    XTPERF_CNT_CYCLES, XTPERF_MASK_CYCLES, // total cycles
+    XTPERF_CNT_INSN, XTPERF_MASK_INSN_ALL, // total instructions
+    XTPERF_CNT_D_LOAD_U1, XTPERF_MASK_D_LOAD_LOCAL_MEM, // Mem read
+    XTPERF_CNT_D_STORE_U1, XTPERF_MASK_D_STORE_LOCAL_MEM, // Mem write
+    XTPERF_CNT_BUBBLES, XTPERF_MASK_BUBBLES_ALL &(~XTPERF_MASK_BUBBLES_R_HOLD_REG_DEP),  // wait for other reasons
+    XTPERF_CNT_BUBBLES, XTPERF_MASK_BUBBLES_R_HOLD_REG_DEP,           // Wait for register dependency
+    XTPERF_CNT_OVERFLOW, XTPERF_MASK_OVERFLOW,               // Last test cycle
+};
+
+#define TOTAL_CALL_AMOUNT 200
+#define PERFMON_TRACELEVEL -1 // -1 - will ignore trace level
+
+
+
+
 
 #define AC_LOAD 7   // GPIO number for the TRIAC control
 //#define AC_LOAD GPIO_NUM_7   // GPIO number for the TRIAC control
@@ -267,6 +305,33 @@ void app_main(void)
     
     xTaskCreate(tarefaLeituraBotoes, "LeituraBotoes", 4096, NULL, tskIDLE_PRIORITY + 1, NULL);
 
+       ESP_LOGI(TAG, "Start");
+    ESP_LOGI(TAG, "Start test with printing all available statistic");
+    xtensa_perfmon_config_t pm_config = {};
+    pm_config.counters_size = sizeof(xtensa_perfmon_select_mask_all) / sizeof(uint32_t) / 2;
+    pm_config.select_mask = xtensa_perfmon_select_mask_all;
+    pm_config.repeat_count = TOTAL_CALL_AMOUNT;
+    pm_config.max_deviation = 1;
+    pm_config.call_function = exec_test_function;
+    pm_config.callback = xtensa_perfmon_view_cb;
+    pm_config.callback_params = stdout;
+    pm_config.tracelevel = PERFMON_TRACELEVEL;
+    xtensa_perfmon_exec(&pm_config);
+
+    ESP_LOGI(TAG, "Start test with user defined statistic");
+    pm_config.counters_size = sizeof(pm_check_table) / sizeof(uint32_t) / 2;
+    pm_config.select_mask = pm_check_table;
+    pm_config.repeat_count = TOTAL_CALL_AMOUNT;
+    pm_config.max_deviation = 1;
+    pm_config.call_function = exec_test_function;
+    pm_config.callback = xtensa_perfmon_view_cb;
+    pm_config.callback_params = stdout;
+    pm_config.tracelevel = PERFMON_TRACELEVEL;
+
+    xtensa_perfmon_exec(&pm_config);
+
+    ESP_LOGI(TAG, "The End");
+    
     while(1){
         ESP_LOGI("RANGE", "%d", (int) global_control_data.range);
         ESP_LOGI("IS_ON", "%d", (int) global_control_data.is_on);
@@ -274,7 +339,7 @@ void app_main(void)
             setState(ptr_dimmer, ON);
             setPower(ptr_dimmer, global_control_data.range);
         }else{
-            setState(ptr_dcimmer, OFF);
+            setState(ptr_dimmer, OFF);
             setPower(ptr_dimmer, 0);
         }
         // wait
